@@ -251,8 +251,9 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    // data["relayPinState"] = relayPinState;
-    // data["sensorType"] = sensorType;
+    data["temperature"] = data1.field1;     /* temp */
+    data["humidity"] = data1.field2;    /* humid */
+    data["pressure"] = data1.field3; /* pressure */
     data["updateInterval"] = PUBLISH_EVERY;
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     // Serial.printf("field2 = %lu \r\n", sensorData.field2);

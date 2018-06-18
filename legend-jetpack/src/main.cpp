@@ -7,6 +7,7 @@
 #include <modules/PRAJModule.h>
 #include <modules/PRAJ_ESPNowModule.h>
 #include <modules/WC_ESPNowModule.h>
+#include <modules/WiFiModule.h>
 #include <modules/MqttModule.h>
 #include <CMMC_Sensor.h>
 
@@ -16,6 +17,8 @@ CMMC_Legend os;
 // float axisY = 0.0;
 // float axisZ = 0.0;
 
+int temp;
+
 void setup()
 {
   // os.addModule(new KadyaiModule());
@@ -24,7 +27,8 @@ void setup()
   // os.addModule(new KadyaiModule());
   // os.addModule(new PRAJModule());
   // os.addModule(new PRAJ_ESPNowModule()); 
-  os.addModule(new WC_ESPNowModule()); 
+  // os.addModule(new WC_ESPNowModule()); 
+  os.addModule(new MqttModule()); 
   os.setup();
   Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
 }
