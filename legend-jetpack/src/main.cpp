@@ -28,6 +28,7 @@ void setup()
   // os.addModule(new PRAJModule());
   // os.addModule(new PRAJ_ESPNowModule()); 
   // os.addModule(new WC_ESPNowModule()); 
+  os.addModule(new WiFiModule()); 
   os.addModule(new MqttModule()); 
   os.setup();
   Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);

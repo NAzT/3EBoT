@@ -6,7 +6,8 @@
 #include <MqttConnector.h>
 #include <CMMC_Sensor.h>
 #include <CMMC_BME280.hpp> 
-
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 class MqttModule: public CMMC_Module {
   public:
@@ -31,9 +32,8 @@ class MqttModule: public CMMC_Module {
     int MQTT_CONNECT_TIMEOUT; 
     bool MQTT_LWT;
     
-    void _read_sensor();
     CMMC_SENSOR_DATA_T data1;
-    CMMC_Sensor *sensor1;
+    Adafruit_BME280 *bme;
 };
 
 #endif

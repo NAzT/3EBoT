@@ -1,19 +1,12 @@
 #include "MqttModule.h"
 extern int temp;
 
+#define SEALEVELPRESSURE_HPA (1013.25)
 #define MQTT_CONFIG_FILE "/mymqtt.json"
+
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {
   static MqttModule *that = this;
-  sensor1 = new CMMC_BME280();
-  sensor1->setup();
-  sensor1->every(1);
-  sensor1->onData([&](void *d, size_t len) {
-    memcpy(&data1, d, len);
-    Serial.printf("ON SENSOR DATA.. at %lums\r\n", millis());
-    Serial.printf("== temp=%lu, humid=%lu, pressure=%lu\r\n", data1.field1, data1.field2, data1.field3);
-  });
-
   strcpy(this->path, "/api/mqtt");
   this->_serverPtr = server;
   this->_managerPtr = new CMMC_ConfigManager(MQTT_CONFIG_FILE);
@@ -98,23 +91,36 @@ void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
-  sensor1->read();
+  bme = new Adafruit_BME280;
+
+  bool status;
+  status = bme->begin(0x76);
+  if (!status)
+  {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    while (1)
+      ;
+  }
 };
 
 void MqttModule::loop()
 {
   mqtt->loop();
-  _read_sensor();
-};
-
-//  Read Sensor
-void MqttModule::_read_sensor()
-{
-  data1.field1 = data1.field1; /* temp */
-  data1.field2 = data1.field2; /* humid */
-  data1.field3 = data1.field3; /* pressure */
+  data1.field1 = bme->readTemperature();                  /* temp */
+  data1.field2 = bme->readHumidity();                     /* humid */
+  data1.field3 = bme->readPressure();                     /* pressure */
+  data1.field4 = bme->readAltitude(SEALEVELPRESSURE_HPA); /* Altitude */
   data1.ms = millis();
-}
+
+  Serial.print(data1.field1);
+  Serial.print("  ");
+  Serial.print(data1.field2);
+  Serial.print("  ");
+  Serial.print(data1.field3);
+  Serial.print("  ");
+  Serial.print(data1.field4);
+  Serial.print("\n");
+};
 
 // MQTT INITIALIZER
 MqttConnector *MqttModule::init_mqtt()
@@ -251,9 +257,9 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    data["temperature"] = data1.field1;     /* temp */
+    data["temperature"] = data1.field1; /* temp */
     data["humidity"] = data1.field2;    /* humid */
-    data["pressure"] = data1.field3; /* pressure */
+    data["pressure"] = data1.field3;    /* pressure */
     data["updateInterval"] = PUBLISH_EVERY;
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     // Serial.printf("field2 = %lu \r\n", sensorData.field2);
