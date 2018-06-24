@@ -24,11 +24,11 @@ CMMC_LED::CMMC_LED(Ticker *ticker)
 };
 
 void CMMC_LED::high() {
-  digitalWrite(_ledPin, HIGH); 
+  digitalWrite(_ledPin, LOW); 
 }
 
 void CMMC_LED::low() {
-  digitalWrite(_ledPin, LOW); 
+  digitalWrite(_ledPin, HIGH); 
 }
 
 void CMMC_LED::setPin(uint8_t pin)
@@ -71,7 +71,7 @@ void CMMC_LED::blink(uint32_t ms)
   static CMMC_LED *_that = this;
   static auto lambda = []() {
     _that->state = !_that->state;
-    if (_that->state == LOW)
+    if (_that->state == HIGH)
     {
       _that->prev_active = millis();
     }
@@ -82,7 +82,7 @@ void CMMC_LED::blink(uint32_t ms)
     if (diff > 60L)
     {
       _that->prev_active = millis();
-      _that->state = HIGH;
+      _that->state = LOW;
       digitalWrite(_pin, _that->state);
     }
   };

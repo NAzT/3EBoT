@@ -17,12 +17,12 @@ void CMMC_Legend::run() {
 
 void CMMC_Legend::isLongPressed() {
   uint32_t prev = millis();
-  while (digitalRead(12) == LOW) {
+  while (digitalRead(15) == HIGH) {
     delay(50);
     if ( (millis() - prev) > 5L * 1000L) {
       Serial.println("LONG PRESSED.");
       blinker->blink(50);
-      while (digitalRead(12) == LOW) {
+      while (digitalRead(15) == HIGH) {
         delay(10);
       }
       SPIFFS.remove("/enabled");
@@ -39,7 +39,7 @@ void CMMC_Legend::setup() {
 void CMMC_Legend::init_gpio() {
   Serial.begin(57600);
   Serial.println("OS::Init GPIO..");
-  pinMode(12, INPUT_PULLUP);
+  pinMode(15, INPUT);
   blinker = new CMMC_LED;
   blinker->init();
   blinker->setPin(2);

@@ -9,6 +9,7 @@
 #include <modules/WC_ESPNowModule.h>
 #include <modules/WiFiModule.h>
 #include <modules/MqttModule.h>
+#include <modules/LCD128x64Module.h>
 #include <CMMC_Sensor.h>
 
 CMMC_Legend os;
@@ -28,8 +29,9 @@ void setup()
   // os.addModule(new PRAJModule());
   // os.addModule(new PRAJ_ESPNowModule()); 
   // os.addModule(new WC_ESPNowModule()); 
-  os.addModule(new WiFiModule()); 
-  os.addModule(new MqttModule()); 
+  // os.addModule(new WiFiModule()); 
+  // os.addModule(new MqttModule()); 
+  os.addModule(new LCD128x64Module()); 
   os.setup();
   Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
 }
