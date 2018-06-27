@@ -16,7 +16,7 @@ void BME680Module::setup() {
     temp = data.field1;
     Serial.printf("onData temp = %d\r\n", temp);
   }); 
-  bme->every(3000);
+  bme->every(1000);
   bme->setup(0, 0);
 }
 

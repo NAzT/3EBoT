@@ -1,12 +1,9 @@
 #include "MqttModule.h"
 extern int temp;
 
-#define SEALEVELPRESSURE_HPA (1013.25)
 #define MQTT_CONFIG_FILE "/mymqtt.json"
-
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {
-  static MqttModule *that = this;
   strcpy(this->path, "/api/mqtt");
   this->_serverPtr = server;
   this->_managerPtr = new CMMC_ConfigManager(MQTT_CONFIG_FILE);
@@ -91,38 +88,63 @@ void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
-  bme = new Adafruit_BME280;
 
+  u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
+  u8g2->begin();
+  u8g2->firstPage();
+  do
+  {
+    u8g2->setFont(u8g2_font_ncenB10_tr);
+    u8g2->drawStr(0, 11, "3E-BOT");
+  } while (u8g2->nextPage());
+  delay(2000);
+
+  Wire.begin(4, 5);
+  bme = new Adafruit_BME280();
   bool status;
   status = bme->begin(0x76);
   if (!status)
   {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1)
-      ;
   }
+  Serial.println(F("BMP280 test"));
 };
 
 void MqttModule::loop()
 {
-  mqtt->loop();
-  data1.field1 = bme->readTemperature();                  /* temp */
-  data1.field2 = bme->readHumidity();                     /* humid */
-  data1.field3 = bme->readPressure();                     /* pressure */
-  data1.field4 = bme->readAltitude(SEALEVELPRESSURE_HPA); /* Altitude */
-  data1.ms = millis();
+  u8g2->firstPage();
+  do
+  {
+    u8g2->setFont(u8g2_font_ncenB10_tr);
+    u8g2->drawStr(0, 11, "3E-BOT");
+    u8g2->drawStr(0, 21, " Weather Station");
+    u8g2->setFont(u8g2_font_ncenB08_tr);
+    u8g2->setCursor(0, 31);
+    u8g2->print("Temp = " + String(bme->readTemperature()));
+    // u8g2->setFont(u8g2_font_unifont_t_symbols);
+    // u8g2->drawUTF8(5, 30, "Snowman ☃");
+  } while (u8g2->nextPage());
 
-  Serial.print(data1.field1);
-  Serial.print("  ");
-  Serial.print(data1.field2);
-  Serial.print("  ");
-  Serial.print(data1.field3);
-  Serial.print("  ");
-  Serial.print(data1.field4);
-  Serial.print("\n");
+  Serial.print(F("Temperature = "));
+  Serial.print(bme->readTemperature());
+  Serial.println(" *C");
+
+  Serial.print(F("Pressure = "));
+  Serial.print(bme->readPressure());
+  Serial.println(" Pa");
+
+  Serial.print(F("Approx altitude = "));
+  Serial.print(bme->readAltitude(1013.25)); // this should be adjusted to your local forcase
+  Serial.println(" m");
+
+  Serial.println();
+  delay(2000);
+
+  mqtt->loop();
 };
 
 // MQTT INITIALIZER
+
 MqttConnector *MqttModule::init_mqtt()
 {
   this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT);
@@ -257,9 +279,8 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    data["temperature"] = data1.field1; /* temp */
-    data["humidity"] = data1.field2;    /* humid */
-    data["pressure"] = data1.field3;    /* pressure */
+    // data["relayPinState"] = relayPinState;
+    // data["sensorType"] = sensorType;
     data["updateInterval"] = PUBLISH_EVERY;
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     // Serial.printf("field2 = %lu \r\n", sensorData.field2);

@@ -4,10 +4,11 @@
 
 #include <CMMC_Module.h> 
 #include <MqttConnector.h>
-#include <CMMC_Sensor.h>
-#include <CMMC_BME280.hpp> 
+#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <U8g2lib.h>
+#include <SPI.h>
 
 class MqttModule: public CMMC_Module {
   public:
@@ -31,9 +32,9 @@ class MqttModule: public CMMC_Module {
     int PUBLISH_EVERY;
     int MQTT_CONNECT_TIMEOUT; 
     bool MQTT_LWT;
-    
-    CMMC_SENSOR_DATA_T data1;
+
     Adafruit_BME280 *bme;
+    U8G2_ST7920_128X64_1_SW_SPI *u8g2;
 };
 
 #endif

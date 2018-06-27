@@ -11,8 +11,8 @@ void LCD128x64Module::configLoop() {}
 void LCD128x64Module::fristPrint(void)
 {
   u8g2->setFont(u8g2_font_ncenB10_tr);
-  u8g2->drawStr(0, 0, String("Hello my First Display").c_str());
-  delay(500);
+  u8g2->drawStr(0, 11, String("Hello my First Display").c_str());
+  delay(3000);
 }
 
 void LCD128x64Module::setup()
