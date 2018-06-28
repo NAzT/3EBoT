@@ -1,4 +1,6 @@
 #include <CMMC_Module.h>
+#include <U8g2lib.h>
+#include <SPI.h>
 
 #ifndef CMMC_WIFI_MODULE_H
 #define CMMC_WIFI_MODULE_H 
@@ -8,6 +10,7 @@ class WiFiModule: public CMMC_Module {
     void config(CMMC_System *os, AsyncWebServer* server); 
     void setup();
     void loop(); 
+    void isLongPressed();
   protected:
     void configWebServer();
   private:
@@ -15,6 +18,8 @@ class WiFiModule: public CMMC_Module {
     char sta_pwd[30] = "";
     char ap_pwd[30] = ""; 
     void _init_sta(); 
+
+    U8G2_ST7920_128X64_1_SW_SPI *u8g2;
 };
 
 #endif

@@ -32,6 +32,7 @@ void CMMC_Legend::isLongPressed() {
     }
   }
 }
+
 void CMMC_Legend::setup() {
   CMMC_System::setup();
 }

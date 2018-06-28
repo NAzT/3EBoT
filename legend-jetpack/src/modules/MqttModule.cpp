@@ -1,5 +1,7 @@
 #include "MqttModule.h"
+
 extern int temp;
+extern CMMC_SENSOR_DATA_T data1;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
@@ -91,55 +93,60 @@ void MqttModule::setup()
 
   u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
   u8g2->begin();
-  u8g2->firstPage();
-  do
-  {
-    u8g2->setFont(u8g2_font_ncenB10_tr);
-    u8g2->drawStr(0, 11, "3E-BOT");
-  } while (u8g2->nextPage());
-  delay(2000);
 
   Wire.begin(4, 5);
   bme = new Adafruit_BME280();
-  bool status;
-  status = bme->begin(0x76);
-  if (!status)
-  {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-  }
-  Serial.println(F("BMP280 test"));
+  bme->begin(0x76);
+
+  // rtc = new RTC_DS3231();
+  // rtc->begin();
+  // rtc->adjust(DateTime(F(__DATE__), F(__TIME__))); // uncomment for adjust DateTime
 };
 
 void MqttModule::loop()
 {
-  u8g2->firstPage();
-  do
+  DateTime now = rtc->now();
+
+  // Serial.print(now.year(), DEC);
+  // Serial.print('/');
+  // Serial.print(now.month(), DEC);
+  // Serial.print('/');
+  // Serial.print(now.day(), DEC);
+  // Serial.print(" (");
+  // Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
+  // Serial.print(") ");
+  // Serial.print(now.hour(), DEC);
+  // Serial.print(':');
+  // Serial.print(now.minute(), DEC);
+  // Serial.print(':');
+  // Serial.print(now.second(), DEC);
+  // Serial.println();
+
+  data1.field1 = bme->readTemperature();
+  data1.field2 = bme->readHumidity();
+  data1.field3 = bme->readPressure() / 100.0;
+  data1.field4 = bme->readAltitude(1013.25);
+
+  if (millis() % 1000 == 0)
   {
-    u8g2->setFont(u8g2_font_ncenB10_tr);
-    u8g2->drawStr(0, 11, "3E-BOT");
-    u8g2->drawStr(0, 21, " Weather Station");
-    u8g2->setFont(u8g2_font_ncenB08_tr);
-    u8g2->setCursor(0, 31);
-    u8g2->print("Temp = " + String(bme->readTemperature()));
-    // u8g2->setFont(u8g2_font_unifont_t_symbols);
-    // u8g2->drawUTF8(5, 30, "Snowman ☃");
-  } while (u8g2->nextPage());
-
-  Serial.print(F("Temperature = "));
-  Serial.print(bme->readTemperature());
-  Serial.println(" *C");
-
-  Serial.print(F("Pressure = "));
-  Serial.print(bme->readPressure());
-  Serial.println(" Pa");
-
-  Serial.print(F("Approx altitude = "));
-  Serial.print(bme->readAltitude(1013.25)); // this should be adjusted to your local forcase
-  Serial.println(" m");
-
-  Serial.println();
-  delay(2000);
-
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->drawStr(0, 11, "3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 20);
+      u8g2->print(" Temp = " + String(bme->readTemperature()));
+      u8g2->setCursor(0, 30);
+      u8g2->print(" Humid = " + String(bme->readHumidity()));
+      u8g2->setCursor(0, 40);
+      u8g2->print(" Pressure = " + String(bme->readPressure() / 100.0));
+      u8g2->setCursor(0, 50);
+      u8g2->print(" Alt = " + String(bme->readAltitude(1013.25)));
+      // u8g2->setCursor(0, 60);
+      // u8g2->print(" Time = " + String(now.hour()) + ":" + String(now.minute()));
+    } while (u8g2->nextPage());
+  }
   mqtt->loop();
 };
 
@@ -279,10 +286,23 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    // data["relayPinState"] = relayPinState;
-    // data["sensorType"] = sensorType;
+    data["temp"] = data1.field1;
+    data["humid"] = data1.field2;
+    data["pressure"] = data1.field3;
+    data["altitude"] = data1.field4;
     data["updateInterval"] = PUBLISH_EVERY;
+
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
+    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
+    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
+    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
+    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
+    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
+
+    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
+    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
+    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
+    // if (sensorData.field4) { data["field4"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     // Serial.printf("field2 = %lu \r\n", sensorData.field2);
     // Serial.printf("field3 = %lu \r\n", sensorData.field3);
     // Serial.printf("field4 = %lu \r\n", sensorData.field4);
@@ -298,9 +318,63 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // if (sensorData.field7) { data["field7"] = sensorData.field7; }
     // if (sensorData.field8) { data["field8"] = sensorData.field8; }
     // if (sensorData.ms) { data["ms"] = sensorData.ms; }
+    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld4; }
+    // if (sensorData.field5) { data["field5"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
+    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
+    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
+    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
+    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
+    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
+
+    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
+    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
+    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
+    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
+    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
+    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
+    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
+    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
+    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
+    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld5; }
+    // if (sensorData.field6) { data["field6"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
+    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
+    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
+    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
+    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
+    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
+
+    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
+    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
+    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
+    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
+    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
+    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
+    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
+    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
+    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
+    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld6; }
+    // if (sensorData.field7) { data["field7"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
+    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
+    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
+    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
+    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
+    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
+
+    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
+    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
+    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
+    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
+    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
+    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
+    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
+    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
+    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
+    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld7; }
+    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
+    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
     // if (sensorData.battery) { data["battery"] = sensorData.battery; }
     Serial.println("PUBLISHING...!");
-    Serial.printf("temp = %d\r\n", temp);
+    // Serial.printf("temp = %d\r\n", bme->readTemperature());
   },
                         PUBLISH_EVERY);
 

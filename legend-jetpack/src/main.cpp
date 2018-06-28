@@ -9,6 +9,15 @@ CMMC_Legend os;
 
 int temp;
 
+// 3EBot_1
+// mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i j8pShiIYNIerG8n6 -u "1Xzlmdf3MNFjRgu" -P "2bugw3+nLiKqzxZxmIUkfEbCPtU=" -p 1883 -d
+// 3EBot_2
+// mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i 4bYQs345yXHQIGN5 -u "1Xzlmdf3MNFjRgu" -P "ubJkmJoT16BHDVoZzB8FmlMzsVU=" -p 1883 -d
+
+
+// debug
+// mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i LOuN74G9Hh0WHk3R -u "1Xzlmdf3MNFjRgu" -P "q+t0cKm1J4VJnzaQEtT4T1u38J8=" -p 1883 -d
+
 void setup()
 { 
   os.addModule(new WiFiModule()); 

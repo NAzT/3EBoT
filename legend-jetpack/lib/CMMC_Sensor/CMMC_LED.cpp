@@ -85,7 +85,7 @@ void CMMC_LED::blink(uint32_t ms)
       _that->state = LOW;
       digitalWrite(_pin, _that->state);
     }
-  };
+  };  
   // auto function  = static_cast<void (*)(int)>(lambda);
   this->_ticker->attach_ms(ms, lambda);
   this->_ticker2->attach_ms(30, wtf);
