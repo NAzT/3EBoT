@@ -43,7 +43,7 @@ void CMMC_Legend::init_gpio() {
   pinMode(15, INPUT);
   blinker = new CMMC_LED;
   blinker->init();
-  blinker->setPin(2);
+  blinker->setPin(16);
   Serial.println();
   blinker->blink(500);
   delay(10);

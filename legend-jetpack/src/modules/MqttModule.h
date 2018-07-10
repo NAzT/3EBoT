@@ -40,6 +40,9 @@ private:
 
   Adafruit_BME280 *bme;
   U8G2_ST7920_128X64_1_SW_SPI *u8g2;
+  char _tempString[10];
+  char _humidString[10];
+  unsigned long previousMillis = 0;
 
   char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
   RTC_DS3231 *rtc;

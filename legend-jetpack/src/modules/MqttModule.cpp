@@ -96,7 +96,25 @@ void MqttModule::setup()
 
   Wire.begin(4, 5);
   bme = new Adafruit_BME280();
-  bme->begin(0x76);
+  bool bmeStatus;
+  bmeStatus = bme->begin(0x76);
+  if (!bmeStatus)
+  {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 25);
+      u8g2->print(" Could not find BME");
+      u8g2->setCursor(0, 35);
+      u8g2->print("   check wiring !");
+    } while (u8g2->nextPage());
+    delay(3000);
+  }
 
   // rtc = new RTC_DS3231();
   // rtc->begin();
@@ -127,25 +145,61 @@ void MqttModule::loop()
   data1.field3 = bme->readPressure() / 100.0;
   data1.field4 = bme->readAltitude(1013.25);
 
-  if (millis() % 1000 == 0)
+  if (data1.field1 <= 0 || data1.field1 >= 100)
   {
     u8g2->firstPage();
     do
     {
       u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->drawStr(0, 11, "3E-BOT");
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
       u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 20);
-      u8g2->print(" Temp = " + String(bme->readTemperature()));
-      u8g2->setCursor(0, 30);
-      u8g2->print(" Humid = " + String(bme->readHumidity()));
-      u8g2->setCursor(0, 40);
-      u8g2->print(" Pressure = " + String(bme->readPressure() / 100.0));
-      u8g2->setCursor(0, 50);
-      u8g2->print(" Alt = " + String(bme->readAltitude(1013.25)));
-      // u8g2->setCursor(0, 60);
-      // u8g2->print(" Time = " + String(now.hour()) + ":" + String(now.minute()));
+      u8g2->setCursor(0, 25);
+      u8g2->print(" Sensor ERROR");
+      u8g2->setCursor(0, 35);
+      u8g2->print("   check wiring !");
     } while (u8g2->nextPage());
+  }
+  else
+  {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= 1000)
+    {
+      previousMillis = currentMillis;
+
+      u8g2->firstPage();
+      do
+      {
+        u8g2->setFont(u8g2_font_ncenB10_tr);
+        //u8g2->drawFrame(0, 0, 128, 31);
+        //u8g2->drawFrame(0, 33, 128, 31);
+
+        dtostrf(bme->readTemperature(), 5, 1, _tempString);
+        dtostrf(bme->readHumidity(), 5, 1, _humidString);
+
+        u8g2->drawStr(15, 13, "Temperature");
+        u8g2->drawStr(33, 28, _tempString);
+        u8g2->drawStr(70, 28, "*C");
+
+        u8g2->drawStr(26, 46, "Humidity");
+        u8g2->drawStr(40, 60, _humidString);
+        u8g2->drawStr(75, 60, "%");
+
+        //u8g2->setFont(u8g2_font_ncenB10_tr);
+        //u8g2->drawStr(0, 11, "3E-BOT");
+        //u8g2->setFont(u8g2_font_ncenB08_tr);
+        //u8g2->setCursor(0, 20);
+        //u8g2->print(" Temp = " + String(bme->readTemperature()));
+        //u8g2->setCursor(0, 30);
+        //u8g2->print(" Humid = " + String(bme->readHumidity()));
+        //u8g2->setCursor(0, 40);
+        //u8g2->print(" Pressure = " + String(bme->readPressure() / 100.0));
+        //u8g2->setCursor(0, 50);
+        //u8g2->print(" Alt = " + String(bme->readAltitude(1013.25)));
+        // u8g2->setCursor(0, 60);
+        // u8g2->print(" Time = " + String(now.hour()) + ":" + String(now.minute()));
+      } while (u8g2->nextPage());
+    }
   }
   mqtt->loop();
 };
@@ -286,10 +340,26 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    data["temp"] = data1.field1;
-    data["humid"] = data1.field2;
-    data["pressure"] = data1.field3;
-    data["altitude"] = data1.field4;
+
+    if (data1.field1 >= 0 && data1.field1 <= 100)
+    {
+      data["temp"] = data1.field1;
+    }
+
+    if (data1.field2 >= 0 && data1.field2 <= 100)
+    {
+      data["humid"] = data1.field2;
+    }
+
+    if (data1.field3 >= 0 && data1.field3 <= 10000)
+    {
+      data["pressure"] = data1.field3;
+    }
+
+    if (data1.field4 >= 0 && data1.field4 <= 10000)
+    {
+      data["altitude"] = data1.field4;
+    }
     data["updateInterval"] = PUBLISH_EVERY;
 
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
