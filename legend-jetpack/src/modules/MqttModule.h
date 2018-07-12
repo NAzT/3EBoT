@@ -16,10 +16,8 @@ class MqttModule : public CMMC_Module
 {
 public:
   void config(CMMC_System *os, AsyncWebServer *server);
-  void configLoop();
   void setup();
   void loop();
-  void isLongPressed();
   
 protected:
   void configWebServer();

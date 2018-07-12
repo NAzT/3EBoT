@@ -204,55 +204,6 @@ void MqttModule::loop()
   mqtt->loop();
 };
 
-
-void MqttModule::configLoop()
-{
-  u8g2->firstPage();
-  do
-  {
-    u8g2->setFont(u8g2_font_ncenB10_tr);
-    u8g2->setCursor(0, 11);
-    u8g2->print("3E-BOT");
-    u8g2->setFont(u8g2_font_ncenB08_tr);
-    u8g2->setCursor(0, 25);
-    u8g2->print(" Config ");
-    u8g2->print(ESP.getChipId());
-  } while (u8g2->nextPage());
-  // delay(200);
-}
-
-void MqttModule::isLongPressed()
-{
-  uint32_t prev = millis();
-  while (digitalRead(15) == HIGH)
-  {
-    delay(50);
-    if ((millis() - prev) > 5L * 1000L)
-    {
-      u8g2->firstPage();
-      do
-      {
-        u8g2->setFont(u8g2_font_ncenB10_tr);
-        u8g2->setCursor(0, 11);
-        u8g2->print("3E-BOT");
-        u8g2->setFont(u8g2_font_ncenB08_tr);
-        u8g2->setCursor(0, 25);
-        u8g2->print(" LONG PRESSED.");
-      } while (u8g2->nextPage());
-
-      Serial.println("LONG PRESSED.");
-      while (digitalRead(15) == HIGH)
-      {
-        delay(10);
-      }
-      SPIFFS.remove("/enabled");
-      Serial.println("being restarted.");
-      delay(1000);
-      ESP.restart();
-    }
-  }
-}
-
 // MQTT INITIALIZER
 
 MqttConnector *MqttModule::init_mqtt()
