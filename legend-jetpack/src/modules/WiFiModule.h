@@ -11,6 +11,8 @@ class WiFiModule: public CMMC_Module {
     void setup();
     void loop(); 
     void isLongPressed();
+
+
   protected:
     void configWebServer();
   private:

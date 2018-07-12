@@ -59,7 +59,7 @@ void WiFiModule::isLongPressed()
         u8g2->setCursor(0, 25);
         u8g2->print(" LONG PRESSED.");
       } while (u8g2->nextPage());
-      
+
       Serial.println("LONG PRESSED.");
       while (digitalRead(15) == HIGH)
       {
@@ -81,6 +81,7 @@ void WiFiModule::setup()
 }
 
 void WiFiModule::loop() {}
+
 void WiFiModule::_init_sta()
 {
   WiFi.softAPdisconnect();

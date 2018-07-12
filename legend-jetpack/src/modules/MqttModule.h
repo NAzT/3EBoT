@@ -16,9 +16,11 @@ class MqttModule : public CMMC_Module
 {
 public:
   void config(CMMC_System *os, AsyncWebServer *server);
+  void configLoop();
   void setup();
   void loop();
-
+  void isLongPressed();
+  
 protected:
   void configWebServer();
   MqttConnector *init_mqtt();
@@ -43,6 +45,7 @@ private:
   char _tempString[10];
   char _humidString[10];
   unsigned long previousMillis = 0;
+  
 
   char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
   RTC_DS3231 *rtc;
