@@ -16,6 +16,7 @@ class MqttModule : public CMMC_Module
 {
 public:
   void config(CMMC_System *os, AsyncWebServer *server);
+  void configLoop();
   void setup();
   void loop();
   
@@ -39,7 +40,7 @@ private:
   bool MQTT_LWT;
 
   Adafruit_BME280 *bme;
-  U8G2_ST7920_128X64_1_SW_SPI *u8g2;
+  U8G2_ST7920_128X64_1_SW_SPI *u8g2 = NULL;
   char _tempString[10];
   char _humidString[10];
   unsigned long previousMillis = 0;

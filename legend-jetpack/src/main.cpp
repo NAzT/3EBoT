@@ -29,7 +29,26 @@ int temp;
 //mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i 2Mw8vVCBYahxQ7gJ -u "1Xzlmdf3MNFjRgu" -P "6OUcPsb9xB/LshR4j0+F98qnWHI=" -p 1883 -d
 // 3EBOT10
 //mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i grZaNj6fNe2qRX6E -u "1Xzlmdf3MNFjRgu" -P "x+at/MLnyeCZ/uueivshMZRZoaY=" -p 1883 -d
-
+// 3EBOT11
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i 8dVVh8hjprUApSiO -u "1Xzlmdf3MNFjRgu" -P "KNg28NgHTN+sBgc3V3/2dWwWmuU=" -p 1883 -d
+// 3EBOT12
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i U7yjGmbKam9ZCjTy -u "1Xzlmdf3MNFjRgu" -P "5kXH8oLtDhr2/MOnwxNtyaYz74I=" -p 1883 -d
+// 3EBOT13
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i lu9sZpHenXIQFSzp -u "1Xzlmdf3MNFjRgu" -P "H3RVBbPggUbF5qmz9arRDKZfhpE=" -p 1883 -d
+// 3EBOT14
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i r6zPATe0ZDoE4Oh3 -u "1Xzlmdf3MNFjRgu" -P "eDsxXwsfGB9G5XZ/2TtaE50Ij8w=" -p 1883 -d
+// 3EBOT15
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i PEsfeShz8I28zFGa -u "1Xzlmdf3MNFjRgu" -P "mYVYNolXaZXTRwjexNS0CyTP/BU=" -p 1883 -d
+// 3EBOT16
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i llNmEMLuEurEXjXG -u "1Xzlmdf3MNFjRgu" -P "DNkjgVYnDbTk8UGBX/luzdBgEjo=" -p 1883 -d
+// 3EBOT17
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i izba1JryJOGc5Ml3 -u "1Xzlmdf3MNFjRgu" -P "hbXfQpkOPnaaqDua1++2U0mrMYk=" -p 1883 -d
+// 3EBOT18
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i eYBWbA5CVY3ttJ9V -u "1Xzlmdf3MNFjRgu" -P "CglOWqr9AK9jgkvrxvTk0W49Uqs=" -p 1883 -d
+// 3EBOT19
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i uD2JzdLAs9DSEx2O -u "1Xzlmdf3MNFjRgu" -P "JQb3x6F54bTWxBMrLYRWvwKD0b0=" -p 1883 -d
+// 3EBOT20
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i 5I2NXUE7Js3UymMs -u "1Xzlmdf3MNFjRgu" -P "dpZGcmDsjxZGV3vfGfcPSc55au4=" -p 1883 -d
 
 
 // debug

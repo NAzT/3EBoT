@@ -86,13 +86,37 @@ void MqttModule::configWebServer()
   });
 }
 
+void MqttModule::configLoop() {
+    if(u8g2 == NULL) {
+    u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
+    u8g2->begin();
+
+    String strID = String(ESP.getChipId(), HEX);
+
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 25);
+      u8g2->print(" CMMC-");
+      u8g2->print(strID);
+    } while (u8g2->nextPage());
+  }
+}
+
 void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
 
-  u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
-  u8g2->begin();
+  if(u8g2 == NULL) {
+    u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
+    u8g2->begin();
+  }
+
 
   Wire.begin(4, 5);
   bme = new Adafruit_BME280();
