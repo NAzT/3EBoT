@@ -4,6 +4,16 @@ extern int temp;
 extern CMMC_SENSOR_DATA_T data1;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
+
+void MqttModule::drawWeather(uint8_t symbol, int degree)
+{
+  // drawWeatherSymbol(0, 48, symbol);
+  // u8g2.setFont(u8g2_font_logisoso32_tf);
+  // u8g2.setCursor(48+3, 42);
+  // u8g2.print(degree);
+  // u8g2.print("°C");		// requires enableUTF8Print()
+}
+
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {
   strcpy(this->path, "/api/mqtt");
@@ -91,7 +101,8 @@ void MqttModule::configLoop() {
     u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
     u8g2->begin();
 
-    String strID = String(ESP.getChipId(), HEX);
+   char strID[10];
+   sprintf(strID, "%08x", ESP.getChipId());
 
     u8g2->firstPage();
     do
@@ -201,9 +212,11 @@ void MqttModule::loop()
         dtostrf(bme->readTemperature(), 5, 1, _tempString);
         dtostrf(bme->readHumidity(), 5, 1, _humidString);
 
+        u8g2->setFont(u8g2_font_open_iconic_embedded_6x_t);
         u8g2->drawStr(15, 13, "Temperature");
         u8g2->drawStr(33, 28, _tempString);
-        u8g2->drawStr(70, 28, "*C");
+        // u8g2->drawStr(70, 28, "*C");
+        u8g2->drawGlyph(70, 28, 67);
 
         u8g2->drawStr(26, 46, "Humidity");
         u8g2->drawStr(40, 60, _humidString);
