@@ -4,6 +4,16 @@ extern int temp;
 extern CMMC_SENSOR_DATA_T data1;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
+
+void MqttModule::drawWeather(uint8_t symbol, int degree)
+{
+  // drawWeatherSymbol(0, 48, symbol);
+  // u8g2.setFont(u8g2_font_logisoso32_tf);
+  // u8g2.setCursor(48+3, 42);
+  // u8g2.print(degree);
+  // u8g2.print("°C");		// requires enableUTF8Print()
+}
+
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {
   strcpy(this->path, "/api/mqtt");
@@ -87,36 +97,12 @@ void MqttModule::configWebServer()
 }
 
 void MqttModule::configLoop() {
-    if(u8g2 == NULL) {
-    u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
-    u8g2->begin();
-
-    String strID = String(ESP.getChipId(), HEX);
-
-    u8g2->firstPage();
-    do
-    {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print(" CMMC-");
-      u8g2->print(strID);
-    } while (u8g2->nextPage());
-  }
 }
 
 void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
-
-  if(u8g2 == NULL) {
-    u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
-    u8g2->begin();
-  }
-
 
   Wire.begin(4, 5);
   bme = new Adafruit_BME280();
@@ -125,19 +111,6 @@ void MqttModule::setup()
   if (!bmeStatus)
   {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    u8g2->firstPage();
-    do
-    {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print(" Could not find BME");
-      u8g2->setCursor(0, 35);
-      u8g2->print("   check wiring !");
-    } while (u8g2->nextPage());
-    delay(3000);
   }
 
   // rtc = new RTC_DS3231();
@@ -171,58 +144,13 @@ void MqttModule::loop()
 
   if (data1.field1 <= 0 || data1.field1 >= 100)
   {
-    u8g2->firstPage();
-    do
-    {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print(" Sensor ERROR");
-      u8g2->setCursor(0, 35);
-      u8g2->print("   check wiring !");
-    } while (u8g2->nextPage());
+
   }
   else
   {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= 1000)
-    {
+    if (currentMillis - previousMillis >= 1000) {
       previousMillis = currentMillis;
-
-      u8g2->firstPage();
-      do
-      {
-        u8g2->setFont(u8g2_font_ncenB10_tr);
-        //u8g2->drawFrame(0, 0, 128, 31);
-        //u8g2->drawFrame(0, 33, 128, 31);
-
-        dtostrf(bme->readTemperature(), 5, 1, _tempString);
-        dtostrf(bme->readHumidity(), 5, 1, _humidString);
-
-        u8g2->drawStr(15, 13, "Temperature");
-        u8g2->drawStr(33, 28, _tempString);
-        u8g2->drawStr(70, 28, "*C");
-
-        u8g2->drawStr(26, 46, "Humidity");
-        u8g2->drawStr(40, 60, _humidString);
-        u8g2->drawStr(75, 60, "%");
-
-        //u8g2->setFont(u8g2_font_ncenB10_tr);
-        //u8g2->drawStr(0, 11, "3E-BOT");
-        //u8g2->setFont(u8g2_font_ncenB08_tr);
-        //u8g2->setCursor(0, 20);
-        //u8g2->print(" Temp = " + String(bme->readTemperature()));
-        //u8g2->setCursor(0, 30);
-        //u8g2->print(" Humid = " + String(bme->readHumidity()));
-        //u8g2->setCursor(0, 40);
-        //u8g2->print(" Pressure = " + String(bme->readPressure() / 100.0));
-        //u8g2->setCursor(0, 50);
-        //u8g2->print(" Alt = " + String(bme->readAltitude(1013.25)));
-        // u8g2->setCursor(0, 60);
-        // u8g2->print(" Time = " + String(now.hour()) + ":" + String(now.minute()));
-      } while (u8g2->nextPage());
     }
   }
   mqtt->loop();

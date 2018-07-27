@@ -2,7 +2,6 @@
 #ifndef CMMC_MQTT_MODULE_H
 #define CMMC_MQTT_MODULE_H
 
-#include <CMMC_Module.h>
 #include <MqttConnector.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
@@ -11,6 +10,7 @@
 #include <U8g2lib.h>
 #include <SPI.h>
 #include <CMMC_Sensor.h>
+#include <CMMC_Module.h>
 
 class MqttModule : public CMMC_Module
 {
@@ -44,10 +44,10 @@ private:
   char _tempString[10];
   char _humidString[10];
   unsigned long previousMillis = 0;
-  
 
   char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
   RTC_DS3231 *rtc;
+  void drawWeather(uint8_t symbol, int degree);
 
   CMMC_SENSOR_DATA_T data1;
 };
