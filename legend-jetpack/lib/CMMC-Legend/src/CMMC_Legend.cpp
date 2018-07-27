@@ -5,6 +5,7 @@ void CMMC_Legend::addModule(CMMC_Module* module) {
   Serial.printf("addModule.. size = %d\r\n", _modules.size());
 }
 
+// being called by os
 void CMMC_Legend::run() {
   static CMMC_Legend *that = this;
   int size = _modules.size();
@@ -13,6 +14,16 @@ void CMMC_Legend::run() {
   }
   isLongPressed();
   yield();
+}
+
+bool CMMC_Legend::setEnable(bool status) {
+  if (status) {
+    File f = SPIFFS.open("/enabled", "a+"); 
+    return f;
+  }
+  else {
+      return SPIFFS.remove("/enabled"); 
+  }
 }
 
 void CMMC_Legend::isLongPressed() {
@@ -25,9 +36,9 @@ void CMMC_Legend::isLongPressed() {
       while (digitalRead(15) == HIGH) {
         delay(10);
       }
-      SPIFFS.remove("/enabled");
+      setEnable(false);
       Serial.println("being restarted.");
-      delay(1000);
+      delay(100);
       ESP.restart();
     }
   }
@@ -91,10 +102,18 @@ void CMMC_Legend::init_network() {
     _init_ap();
     setupWebServer(&server, &ws, &events);
     blinker->blink(50);
+    uint32_t startConfigLoopAtMs = millis();
     while (1) {
-      for (int i = 0 ; i < _modules.size(); i++) {
+      for (int i = 0 ; i < _modules.size(); i++) { 
         _modules[i]->configLoop();
       }
+
+      if ( (millis() - startConfigLoopAtMs) > 10L*60*1000) {
+          setEnable(true);
+          delay(100);
+          ESP.restart();
+      }
+
       yield();
     }
   }
@@ -153,7 +172,8 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       Serial.println("file open failed");
     }
     request->send(200, "text/plain", String("ENABLING.. ") + String(ESP.getFreeHeap()));
-    // ESP.restart();
+    delay(100);
+    ESP.restart();
   });
 
   static const char* fsServerIndex = "<form method='POST' action='/do-fs' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
@@ -206,6 +226,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
         blinker->blink(1000);
+        ESP.restart();
       } else {
         Update.printError(Serial);
       }
@@ -247,6 +268,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
         blinker->blink(1000);
+        ESP.restart();
       } else {
         Update.printError(Serial);
       }
