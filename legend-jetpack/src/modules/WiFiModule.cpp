@@ -92,9 +92,11 @@ void WiFiModule::_init_sta()
 
   while (WiFi.status() != WL_CONNECTED)
   {
-    Serial.printf("Connecting to %s:%s\r\n", sta_ssid, sta_pwd);
+    Serial.printf("Connecting to %s:%s\r\n", sta_ssid, sta_pwd); 
+    lcdModule->displayConnectingWiFi(sta_ssid);
     isLongPressed();
     delay(300);
   }
+  lcdModule->displayWiFiConnected();
   Serial.println("WiFi Connected.");
 }

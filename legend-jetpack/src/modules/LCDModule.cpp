@@ -26,6 +26,33 @@ void LCDModule::displayConfigWiFi() {
   } while (u8g2->nextPage()); 
 }
 
+void LCDModule::displayConnectingWiFi(const char* sta_ssid) {
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 25);
+      u8g2->print(" Connecting to ");
+      u8g2->print(sta_ssid);
+    } while (u8g2->nextPage()); 
+}
+
+void LCDModule::displayWiFiConnected() {
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 25);
+      u8g2->print("WiFi Connected.");
+    } while (u8g2->nextPage()); 
+}
+
 void LCDModule::configLoop() {
   if (digitalRead(0) == HIGH) {
     while(digitalRead(0) == HIGH) {
