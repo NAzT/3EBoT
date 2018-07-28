@@ -127,7 +127,7 @@ void CMMC_Legend::init_network() {
     SPIFFS.begin();
     File f = SPIFFS.open("/enabled", "a+");
     Serial.println("stopAll");
-    delay(1000);
+    delay(200);;
     ESP.restart();
   }
   else if (mode == RUN) {

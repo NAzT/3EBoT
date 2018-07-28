@@ -8,6 +8,7 @@ extern LCDModule* lcdModule;
 
 void WiFiModule::isLongPressed() {
   if (digitalRead(15) == HIGH) {
+    lcdModule->displayLogo();
     Serial.println("15 PRESSED.");
     while(digitalRead(15) == HIGH) {
       delay(10); 
