@@ -81,9 +81,6 @@ void LCDModule::configWebServer()
 
 void LCDModule::setup()
 {
-  u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
-  u8g2->begin(); 
-  displayLogo();
 }
 
 void LCDModule::loop() {
