@@ -17,7 +17,6 @@ WiFiModule* wifiModule;
 
 void setup()
 { 
-  Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
 
   lcdModule = new LCDModule();
   wifiModule = new WiFiModule();
@@ -31,6 +30,7 @@ void setup()
   os.addModule(new MqttModule()); 
 
   os.setup();
+  Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
 }
 
 void loop()

@@ -103,6 +103,7 @@ void CMMC_Legend::init_network() {
 
   if (mode == SETUP) {
 
+    Serial.println("calling confgSetup");
     for (int i = 0 ; i < _modules.size(); i++) {
       _modules[i]->configSetup();
     }
