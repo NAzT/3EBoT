@@ -17,16 +17,15 @@ WiFiModule* wifiModule;
 
 void setup()
 { 
-
   lcdModule = new LCDModule();
   wifiModule = new WiFiModule();
   ntpModule = new NTPModule();
   sensorModule = new SensorModule();
 
+  os.addModule(sensorModule);
   os.addModule(lcdModule); 
   os.addModule(wifiModule); 
   os.addModule(ntpModule); 
-  os.addModule(sensorModule);
   os.addModule(new MqttModule()); 
 
   os.setup();

@@ -17,7 +17,7 @@ void LCDModule::displayLogo() {
     
     u8g2->setCursor(40, 46);
     u8g2->setFont(u8g2_font_10x20_te);
-    u8g2->print("v1.0"); 
+    u8g2->print("v1.3"); 
   } while (u8g2->nextPage()); 
   delay(2000);
 }
@@ -69,8 +69,8 @@ void LCDModule::displayWiFiConnected() {
 }
 
 void LCDModule::configLoop() {
-  if (digitalRead(0) == HIGH) {
-    while(digitalRead(0) == HIGH) {
+  if (digitalRead(0) == LOW) {
+    while(digitalRead(0) == LOW) {
       delay(10); 
     } 
     File f = SPIFFS.open("/enabled", "a+");
