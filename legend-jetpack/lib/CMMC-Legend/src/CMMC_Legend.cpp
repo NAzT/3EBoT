@@ -38,7 +38,7 @@ void CMMC_Legend::isLongPressed() {
       }
       setEnable(false);
       Serial.println("being restarted.");
-      delay(100);
+      delay(1000);
       ESP.restart();
     }
   }
@@ -172,7 +172,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       Serial.println("file open failed");
     }
     request->send(200, "text/plain", String("ENABLING.. ") + String(ESP.getFreeHeap()));
-    delay(100);
+    delay(1000);
     ESP.restart();
   });
 
@@ -195,11 +195,16 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
   server->on("/do-fs", HTTP_POST, [](AsyncWebServerRequest * request) {
     // the request handler is triggered after the upload has finished...
     // create the response, add header, and send response
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+    bool updateHasError = Update.hasError();
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (updateHasError) ? "FAIL" : "OK");
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     // restartRequired = true;  // Tell the main loop to restart the ESP
     request->send(response);
+    if (!updateHasError) {
+      // delay(1000);
+      // ESP.restart();
+    }
   }, [](AsyncWebServerRequest * request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
     //Upload handler chunks in data
     if (!index) { // if index == 0 then this is the first frame of data
@@ -226,7 +231,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
         blinker->blink(1000);
-        ESP.restart();
+        // ESP.restart();
       } else {
         Update.printError(Serial);
       }
@@ -237,11 +242,14 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
   server->on("/do-firmware", HTTP_POST, [](AsyncWebServerRequest * request) {
     // the request handler is triggered after the upload has finished...
     // create the response, add header, and send response
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+    bool updateHasError = Update.hasError();
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", (updateHasError) ? "FAIL" : "OK");
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     // restartRequired = true;  // Tell the main loop to restart the ESP
     request->send(response);
+    if (!updateHasError) {
+    }
   }, [](AsyncWebServerRequest * request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
     //Upload handler chunks in data
     if (!index) { // if index == 0 then this is the first frame of data
@@ -267,8 +275,9 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
     if (final) { // if the final flag is set then this is the last frame of data
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
-        blinker->blink(1000);
-        ESP.restart();
+        blinker->blink(500);
+        SPIFFS.begin();
+        File f = SPIFFS.open("/enabled", "a+");
       } else {
         Update.printError(Serial);
       }

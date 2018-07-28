@@ -7,7 +7,7 @@ void LCDModule::displayLogo() {
   {
     u8g2->drawXBM(0, 0, 128, 64, logo);
   } while (u8g2->nextPage()); 
-  delay(2000);
+  delay(500);
 }
 
 void LCDModule::displayConfigWiFi() {
@@ -75,7 +75,6 @@ void LCDModule::configWebServer()
 {
   static LCDModule *that = this;
 }
-
 
 void LCDModule::setup()
 {
