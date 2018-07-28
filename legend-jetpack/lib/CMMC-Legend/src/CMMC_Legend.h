@@ -49,6 +49,7 @@ class CMMC_Legend: public CMMC_System {
     char ap_ssid[30] = "CMMC-Legend";
     void _init_ap(); 
     void setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, AsyncEventSource *events); 
+    bool stopFlag = false;
 };
 
 #endif
