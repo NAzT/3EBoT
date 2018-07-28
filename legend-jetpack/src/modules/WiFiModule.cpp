@@ -16,6 +16,10 @@ void WiFiModule::configLoop() {
   }
 }
 
+void WiFiModule::configSetup() {
+  lcdModule->displayConfigWiFi(); 
+}
+
 void WiFiModule::config(CMMC_System *os, AsyncWebServer *server)
 {
   strcpy(this->path, "/api/wifi/sta");
@@ -43,9 +47,6 @@ void WiFiModule::config(CMMC_System *os, AsyncWebServer *server)
     strcpy(that->sta_ssid, sta_config[0]);
     strcpy(that->sta_pwd, sta_config[1]);
   });
-  if (lcdModule) {
-    lcdModule->displayConfigWiFi(); 
-  }
   this->configWebServer();
 }
 
@@ -79,7 +80,9 @@ void WiFiModule::setup()
   _init_sta();
 }
 
-void WiFiModule::loop() {}
+void WiFiModule::loop() {
+
+}
 
 void WiFiModule::_init_sta()
 {

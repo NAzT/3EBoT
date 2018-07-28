@@ -95,14 +95,23 @@ void CMMC_Legend::init_user_config() {
 
 void CMMC_Legend::init_network() {
   Serial.println("Initializing network.");
+
   for (int i = 0 ; i < _modules.size(); i++) {
+    Serial.println("call module.config()"); 
     _modules[i]->config(this, &server);
   }
+
   if (mode == SETUP) {
+
+    for (int i = 0 ; i < _modules.size(); i++) {
+      _modules[i]->configSetup();
+    }
+
     _init_ap();
     setupWebServer(&server, &ws, &events);
     blinker->blink(50);
     uint32_t startConfigLoopAtMs = millis();
+
     while (1) {
       for (int i = 0 ; i < _modules.size(); i++) { 
         _modules[i]->configLoop();
