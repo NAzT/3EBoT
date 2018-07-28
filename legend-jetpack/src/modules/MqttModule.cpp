@@ -1,7 +1,5 @@
 #include "MqttModule.h"
 
-extern int temp;
-
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
@@ -49,17 +47,14 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
       lwt = String(mqtt_configs[7]).toInt();
       pubEveryS = String(mqtt_configs[8]).toInt();
 
-      if (strcmp(mqtt_device_name, "") == 0)
-      {
+      if (strcmp(mqtt_device_name, "") == 0) {
         sprintf(mqtt_device_name, "%08x", ESP.getChipId());
       }
-      else
-      {
+      else {
         Serial.printf("DEVICE NAME = %s\r\n", mqtt_device_name);
       }
 
-      if (strcmp(mqtt_clientId, "") == 0)
-      {
+      if (strcmp(mqtt_clientId, "") == 0) {
         sprintf(mqtt_clientId, "%08x", ESP.getChipId());
       }
     }
@@ -98,8 +93,7 @@ void MqttModule::setup()
   bme = new Adafruit_BME280();
   bool bmeStatus;
   bmeStatus = bme->begin(0x76);
-  if (!bmeStatus)
-  {
+  if (!bmeStatus) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   }
 };
