@@ -5,15 +5,6 @@ extern CMMC_SENSOR_DATA_T data1;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 
-void MqttModule::drawWeather(uint8_t symbol, int degree)
-{
-  // drawWeatherSymbol(0, 48, symbol);
-  // u8g2.setFont(u8g2_font_logisoso32_tf);
-  // u8g2.setCursor(48+3, 42);
-  // u8g2.print(degree);
-  // u8g2.print("°C");		// requires enableUTF8Print()
-}
-
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {
   strcpy(this->path, "/api/mqtt");
@@ -113,29 +104,10 @@ void MqttModule::setup()
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   }
 
-  // rtc = new RTC_DS3231();
-  // rtc->begin();
-  // rtc->adjust(DateTime(F(__DATE__), F(__TIME__))); // uncomment for adjust DateTime
 };
 
 void MqttModule::loop()
 {
-  DateTime now = rtc->now();
-
-  // Serial.print(now.year(), DEC);
-  // Serial.print('/');
-  // Serial.print(now.month(), DEC);
-  // Serial.print('/');
-  // Serial.print(now.day(), DEC);
-  // Serial.print(" (");
-  // Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
-  // Serial.print(") ");
-  // Serial.print(now.hour(), DEC);
-  // Serial.print(':');
-  // Serial.print(now.minute(), DEC);
-  // Serial.print(':');
-  // Serial.print(now.second(), DEC);
-  // Serial.println();
 
   data1.field1 = bme->readTemperature();
   data1.field2 = bme->readHumidity();
@@ -313,92 +285,15 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
       data["altitude"] = data1.field4;
     }
     data["updateInterval"] = PUBLISH_EVERY;
-
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     // Serial.printf("field2 = %lu \r\n", sensorData.field2);
     // Serial.printf("field3 = %lu \r\n", sensorData.field3);
     // Serial.printf("field4 = %lu \r\n", sensorData.field4);
     // Serial.printf("field5 = %lu \r\n", sensorData.field5);
     // Serial.printf("field6 = %lu \r\n", sensorData.field6);
-
-    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
-    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
-    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
-    // if (sensorData.field4) { data["field4"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
-    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
-    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
-    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
-    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
-    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
-
-    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
-    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
-    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
-    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
-    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
-    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
-    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
-    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
-    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
-    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld4; }
-    // if (sensorData.field5) { data["field5"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
-    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
-    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
-    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
-    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
-    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
-
-    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
-    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
-    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
-    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
-    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
-    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
-    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
-    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
-    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
-    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld5; }
-    // if (sensorData.field6) { data["field6"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
-    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
-    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
-    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
-    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
-    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
-
-    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
-    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
-    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
-    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
-    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
-    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
-    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
-    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
-    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
-    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld6; }
-    // if (sensorData.field7) { data["field7"] = sensorData.fi    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
-    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
-    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
-    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
-    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
-    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
-
-    // if (sensorData.field1) { data["field1"] = sensorData.field1; }
-    // if (sensorData.field2) { data["field2"] = sensorData.field2; }
-    // if (sensorData.field3) { data["field3"] = sensorData.field3; }
-    // if (sensorData.field4) { data["field4"] = sensorData.field4; }
-    // if (sensorData.field5) { data["field5"] = sensorData.field5; }
-    // if (sensorData.field6) { data["field6"] = sensorData.field6; }
-    // if (sensorData.field7) { data["field7"] = sensorData.field7; }
-    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
-    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
-    // if (sensorData.battery) { data["battery"] = sensorData.battery; }eld7; }
-    // if (sensorData.field8) { data["field8"] = sensorData.field8; }
-    // if (sensorData.ms) { data["ms"] = sensorData.ms; }
-    // if (sensorData.battery) { data["battery"] = sensorData.battery; }
     Serial.println("PUBLISHING...!");
     // Serial.printf("temp = %d\r\n", bme->readTemperature());
-  },
-                        PUBLISH_EVERY);
+  }, PUBLISH_EVERY);
 
   mqtt->on_after_prepare_data([&](JsonObject *root) {
     /**************
