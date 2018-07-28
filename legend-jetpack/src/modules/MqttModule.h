@@ -44,6 +44,7 @@ private:
   char _humidString[10];
   unsigned long previousMillis = 0;
   CMMC_SENSOR_DATA_T data1;
+  
 };
 
 #endif

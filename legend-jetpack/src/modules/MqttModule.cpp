@@ -1,7 +1,6 @@
 #include "MqttModule.h"
 
 extern int temp;
-extern CMMC_SENSOR_DATA_T data1;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 
@@ -103,7 +102,6 @@ void MqttModule::setup()
   {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   }
-
 };
 
 void MqttModule::loop()
@@ -114,17 +112,10 @@ void MqttModule::loop()
   data1.field3 = bme->readPressure() / 100.0;
   data1.field4 = bme->readAltitude(1013.25);
 
-  if (data1.field1 <= 0 || data1.field1 >= 100)
-  {
+  if (data1.field1 <= 0 || data1.field1 >= 100) {
+  }
 
-  }
-  else
-  {
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= 1000) {
-      previousMillis = currentMillis;
-    }
-  }
+  
   mqtt->loop();
 };
 
