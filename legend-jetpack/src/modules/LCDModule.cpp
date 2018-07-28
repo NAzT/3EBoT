@@ -19,7 +19,7 @@ void LCDModule::displayLogo() {
     u8g2->setFont(u8g2_font_10x20_te);
     u8g2->print("v1.0"); 
   } while (u8g2->nextPage()); 
-  delay(15000);
+  delay(2000);
 }
 
 void LCDModule::displayConfigWiFi() {
@@ -30,39 +30,42 @@ void LCDModule::displayConfigWiFi() {
   do {
       u8g2->setFont(u8g2_font_ncenB10_tr);
       u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
+      u8g2->print("Config Mode");
       u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
+      u8g2->setCursor(0, u8g2->getDisplayHeight()/2);
       u8g2->print(" CMMC-");
       u8g2->print(strID);
   } while (u8g2->nextPage()); 
 }
 
-void LCDModule::displayConnectingWiFi(const char* sta_ssid) {
+void LCDModule::displayConnectingWiFi(const char* sta_ssid, int count) {
     u8g2->firstPage();
     do
     {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setFont(u8g2_font_unifont_t_symbols);
       u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print(" Connecting to ");
+      u8g2->print("Connecting WiFi");
+      u8g2->setFont(u8g2_font_unifont_t_symbols);
+      // https://github.com/olikraus/u8g2/wiki/u8g2reference
+      u8g2->drawGlyph(0+4, 25+3, 9680+count%7);
+      u8g2->setFont(u8g2_font_siji_t_6x10);
+      u8g2->setCursor(10, 25);
+      u8g2->print(" ");
       u8g2->print(sta_ssid);
     } while (u8g2->nextPage()); 
 }
 
 void LCDModule::displayWiFiConnected() {
-    u8g2->firstPage();
-    do
-    {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print("WiFi Connected.");
-    } while (u8g2->nextPage()); 
+    // u8g2->firstPage();
+    // do
+    // {
+    //   u8g2->setFont(u8g2_font_ncenB10_tr);
+    //   u8g2->setCursor(0, 11);
+    //   u8g2->print("3E-BOT");
+    //   u8g2->setFont(u8g2_font_ncenB08_tr);
+    //   u8g2->setCursor(0, 25);
+    //   u8g2->print("WiFi Connected.");
+    // } while (u8g2->nextPage()); 
 }
 
 void LCDModule::configLoop() {
@@ -72,6 +75,7 @@ void LCDModule::configLoop() {
     } 
     File f = SPIFFS.open("/enabled", "a+");
     delay(100);
+    digitalWrite(0, HIGH);
     ESP.restart();
   }
 }
@@ -207,12 +211,13 @@ void LCDModule::loop() {
       u8g2->setFont(u8g2_font_open_iconic_weather_4x_t);
       u8g2->drawGlyph(84, 41, 64+factor);
 
+      int marginLeft = 6;
       u8g2->setFont(u8g2_font_logisoso16_tf);
-      u8g2->setCursor(6, 60);
+      u8g2->setCursor(6+marginLeft, 60);
       u8g2->print(sensorModule->getTemperatureString());
       u8g2->print("°C");
 
-      u8g2->setCursor(76, 60);
+      u8g2->setCursor(78+marginLeft, 60);
       u8g2->print(sensorModule->getHumidityString());
       u8g2->print("%"); 
     } while (u8g2->nextPage()); 

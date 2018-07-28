@@ -65,11 +65,11 @@ void CMMC_Legend::init_fs() {
   SPIFFS.begin();
   Dir dir = SPIFFS.openDir("/");
   isLongPressed();
-  // Serial.println("--------------------------");
-  // while (dir.next()) {
-  //   File f = dir.openFile("r");
-  //   Serial.printf("> %s \r\n", dir.fileName().c_str());
-  // }
+  Serial.println("--------------------------");
+  while (dir.next()) {
+    File f = dir.openFile("r");
+    Serial.printf("> %s \r\n", dir.fileName().c_str());
+  }
   /*******************************************
      Boot Mode Selection
    *******************************************/
@@ -101,14 +101,14 @@ void CMMC_Legend::init_network() {
     _modules[i]->config(this, &server);
   }
 
-  if (mode == SETUP) {
-
+  if (mode == SETUP) { 
     Serial.println("calling confgSetup");
     for (int i = 0 ; i < _modules.size(); i++) {
       _modules[i]->configSetup();
     }
 
-    _init_ap();
+    _init_ap(); 
+
     setupWebServer(&server, &ws, &events);
     blinker->blink(50);
     uint32_t startConfigLoopAtMs = millis();
@@ -116,18 +116,17 @@ void CMMC_Legend::init_network() {
     while (1) {
       for (int i = 0 ; i < _modules.size(); i++) { 
         _modules[i]->configLoop();
-      }
-
+      } 
       if ( (millis() - startConfigLoopAtMs) > 10L*60*1000) {
           setEnable(true);
           delay(100);
           ESP.restart();
       }
-
       yield();
     }
   }
   else if (mode == RUN) {
+    system_update_cpu_freq(80);
     blinker->blink(4000);
     for (int i = 0 ; i < _modules.size(); i++) {
       _modules[i]->setup();
@@ -142,9 +141,9 @@ CMMC_LED *CMMC_Legend::getBlinker() {
 void CMMC_Legend::_init_ap() {
   WiFi.disconnect();
   WiFi.softAPdisconnect();
-  delay(10);
-  WiFi.mode(WIFI_AP);
-  delay(10);
+  delay(100);
+  WiFi.mode(WIFI_AP_STA);
+  delay(100);
   IPAddress Ip(192, 168, 4, 1);
   IPAddress NMask(255, 255, 255, 0);
   WiFi.softAPConfig(Ip, Ip, NMask);
@@ -155,6 +154,7 @@ void CMMC_Legend::_init_ap() {
   Serial.println();
   Serial.print("AP IP address: ");
   Serial.println(myIP);
+  delay(100);
 }
 void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, AsyncEventSource *events) {
   // ws->onEvent(this->onWsEvent);
@@ -241,7 +241,6 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
         blinker->blink(1000);
-        // ESP.restart();
       } else {
         Update.printError(Serial);
       }
@@ -259,19 +258,21 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
     // restartRequired = true;  // Tell the main loop to restart the ESP
     request->send(response);
     if (!updateHasError) {
+      // delay(1000);
+      // ESP.restart();
     }
   }, [](AsyncWebServerRequest * request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
     //Upload handler chunks in data
     if (!index) { // if index == 0 then this is the first frame of data
-      blinker->detach();
       SPIFFS.end();
+      blinker->detach();
       Serial.println("upload start...");
       Serial.printf("UploadStart: %s\n", filename.c_str());
       Serial.setDebugOutput(true);
       // calculate sketch space required for the update
       uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
       bool updateOK = maxSketchSpace < ESP.getFreeSketchSpace();
-      if (!Update.begin(maxSketchSpace)) { //start with max available size
+      if (!Update.begin(maxSketchSpace, U_FLASH)) { //start with max available size
         Update.printError(Serial);
       }
       Update.runAsync(true); // tell the updaterClass to run in async mode
@@ -285,9 +286,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
     if (final) { // if the final flag is set then this is the last frame of data
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
-        blinker->blink(500);
-        SPIFFS.begin();
-        File f = SPIFFS.open("/enabled", "a+");
+        blinker->blink(1000);
       } else {
         Update.printError(Serial);
       }
@@ -341,7 +340,6 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
 
     request->send(404);
   });
-
 
   server->begin();
   Serial.println("Starting webserver->..");
