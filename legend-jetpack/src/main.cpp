@@ -9,22 +9,25 @@
 #include "modules/SensorModule.h"
 
 CMMC_Legend os;
+
 LCDModule *lcdModule;
 NTPModule *ntpModule;
 SensorModule *sensorModule;
+WiFiModule* wifiModule;
 
-int temp;
 void setup()
 { 
   lcdModule = new LCDModule();
+  wifiModule = new WiFiModule();
   ntpModule = new NTPModule();
   sensorModule = new SensorModule();
 
-  os.addModule(lcdModule); 
-  os.addModule(new WiFiModule()); 
-  os.addModule(ntpModule); 
   os.addModule(sensorModule);
+  os.addModule(lcdModule); 
+  os.addModule(wifiModule); 
+  os.addModule(ntpModule); 
   os.addModule(new MqttModule()); 
+
   os.setup();
   Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
 }

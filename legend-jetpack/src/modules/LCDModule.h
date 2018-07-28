@@ -14,13 +14,13 @@ class LCDModule: public CMMC_Module {
     void isLongPressed(); 
     void configLoop();
     void displayConfigWiFi();
-    void displayConnectingWiFi(const char*);
+    void displayConnectingWiFi(const char*, int count=0);
     void displayWiFiConnected();
+    void displayLogo();
   protected:
     void configWebServer();
   private:
     U8G2_ST7920_128X64_1_SW_SPI *u8g2;
-    void displayLogo();
     CMMC_Interval interval;
     bool wifiConnected = false;
 };

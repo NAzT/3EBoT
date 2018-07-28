@@ -1,6 +1,4 @@
 #include <CMMC_Module.h>
-#include <U8g2lib.h>
-#include <SPI.h>
 
 #ifndef CMMC_WIFI_MODULE_H
 #define CMMC_WIFI_MODULE_H 
@@ -8,6 +6,7 @@
 class WiFiModule: public CMMC_Module {
   public:
     void config(CMMC_System *os, AsyncWebServer* server); 
+    void configSetup();
     void setup();
     void loop(); 
     void isLongPressed(); 

@@ -5,34 +5,16 @@ void NTPModule::configLoop() {
 
 }
 
-void NTPModule::setup() {
-  udp.begin(localPort);
-}
-
 void NTPModule::config(CMMC_System *os, AsyncWebServer *server) {
 }
 
 void NTPModule::configWebServer()
 {
   static NTPModule *that = this;
-}
+} 
 
-String NTPModule::getTimeString() {
-  String timeString = "";
-  unsigned long _epoch = epoch+25200;
-  timeString += ((_epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
-  timeString += (':');
-  if ( ((_epoch % 3600) / 60) < 10 ) {
-    timeString+=('0');
-  }
-  timeString+= ((_epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
-  timeString+= (':');
-  if ( (_epoch % 60) < 10 ) {
-    // In the first 10 seconds of each minute, we'll want a leading '0'
-    timeString+= ('0');
-  }
-  timeString+=(_epoch % 60); // print the second
-  return timeString;
+void NTPModule::setup() {
+  udp.begin(localPort);
 }
 
 void NTPModule::loop() {
@@ -55,9 +37,9 @@ void NTPModule::loop() {
     }
   });
 
-  interval2.every_ms(1000, [&]() {
-    printTime(); 
-  });
+  // interval2.every_ms(1000, [&]() {
+  //   printTime(); 
+  // });
 }
 
 void NTPModule::printTime() {
@@ -103,4 +85,22 @@ void NTPModule::sendNTPpacket(IPAddress& address)
   udp.beginPacket(address, 123); //NTP requests are to port 123
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
+}
+
+String NTPModule::getTimeString() {
+  String timeString = "";
+  unsigned long _epoch = epoch+25200;
+  timeString += ((_epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
+  timeString += (':');
+  if ( ((_epoch % 3600) / 60) < 10 ) {
+    timeString+=('0');
+  }
+  timeString+= ((_epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
+  timeString+= (':');
+  if ( (_epoch % 60) < 10 ) {
+    // In the first 10 seconds of each minute, we'll want a leading '0'
+    timeString+= ('0');
+  }
+  timeString+=(_epoch % 60); // print the second
+  return timeString;
 }

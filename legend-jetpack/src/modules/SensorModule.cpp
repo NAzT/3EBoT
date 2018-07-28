@@ -1,8 +1,7 @@
 #include "SensorModule.h"
 #include "LCDModule.h"
 
-
-extern LCDModule* lcdModule;
+extern LCDModule* lcdModule; 
 
 void SensorModule::configLoop() {
 }
@@ -32,11 +31,24 @@ void SensorModule::setup()
 
 void SensorModule::loop() 
 { 
-  interval.every_ms(5000, [&]() {
+  interval.every_ms(5000, [&]() { 
+    _temperature = bme->readTemperature();
+    _humidity = bme->readHumidity();
+    
     Serial.println("read sensor...");
     data1.field1 = bme->readTemperature();
     data1.field2 = bme->readHumidity();
     data1.field3 = bme->readPressure() / 100.0;
     data1.field4 = bme->readAltitude(1013.25); 
   });
+}
+
+String SensorModule::getTemperatureString() { 
+  char buffer[10];
+  sprintf(buffer,"%.1f", _temperature);
+  return String(buffer); 
+}
+
+String SensorModule::getHumidityString() { 
+  return String((int)_humidity); 
 }

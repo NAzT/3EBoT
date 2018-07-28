@@ -5,15 +5,26 @@
 
 extern LCDModule* lcdModule;
 
-void WiFiModule::configLoop() {
-  if (digitalRead(0) == HIGH) {
-    while(digitalRead(0) == HIGH) {
+
+void WiFiModule::isLongPressed() {
+  if (digitalRead(15) == HIGH) {
+    lcdModule->displayLogo();
+    Serial.println("15 PRESSED.");
+    while(digitalRead(15) == HIGH) {
       delay(10); 
     } 
-    File f = SPIFFS.open("/enabled", "a+");
-    delay(100);
+    SPIFFS.remove("/enabled");
+    digitalWrite(0, HIGH);
+    delay(1000);
     ESP.restart();
-  }
+  } 
+}
+void WiFiModule::configLoop() {
+  isLongPressed();
+}
+
+void WiFiModule::configSetup() {
+  lcdModule->displayConfigWiFi(); 
 }
 
 void WiFiModule::config(CMMC_System *os, AsyncWebServer *server)
@@ -43,9 +54,6 @@ void WiFiModule::config(CMMC_System *os, AsyncWebServer *server)
     strcpy(that->sta_ssid, sta_config[0]);
     strcpy(that->sta_pwd, sta_config[1]);
   });
-  if (lcdModule) {
-    lcdModule->displayConfigWiFi(); 
-  }
   this->configWebServer();
 }
 
@@ -56,30 +64,16 @@ void WiFiModule::configWebServer()
     String output = that->saveConfig(request, this->_managerPtr);
     request->send(200, "application/json", output);
   });
-}
+} 
 
-void WiFiModule::isLongPressed()
-{
-  uint32_t prev = millis();
-  while (digitalRead(15) == HIGH)
-  {
-    delay(50);
-    if ((millis() - prev) > 5L * 1000L)
-    {
-      Serial.println("LONG PRESSED.");
-      while (digitalRead(15) == HIGH)
-      {
-        delay(10);
-      }
-    }
-  }
-}
 void WiFiModule::setup()
 {
   _init_sta();
 }
 
-void WiFiModule::loop() {}
+void WiFiModule::loop() {
+
+}
 
 void WiFiModule::_init_sta()
 {
@@ -90,12 +84,13 @@ void WiFiModule::_init_sta()
   delay(20);
   WiFi.begin(sta_ssid, sta_pwd);
 
+  int counter = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.printf("Connecting to %s:%s\r\n", sta_ssid, sta_pwd); 
-    lcdModule->displayConnectingWiFi(sta_ssid);
+    lcdModule->displayConnectingWiFi(sta_ssid, counter++);
     isLongPressed();
-    delay(300);
+    delay(500);
   }
   lcdModule->displayWiFiConnected();
   Serial.println("WiFi Connected.");

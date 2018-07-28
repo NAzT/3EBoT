@@ -191,11 +191,13 @@ void MqttModule::register_receive_hooks(MqttConnector *mqtt)
       else if (payload == "FORCE_CONFIG")
       {
         SPIFFS.remove("/enabled");
+        digitalWrite(0, HIGH);
         ESP.restart();
       }
     }
     else if (cmd == "$/reboot")
     {
+      digitalWrite(0, HIGH);
       ESP.restart();
     }
     else if (cmd == "status")
