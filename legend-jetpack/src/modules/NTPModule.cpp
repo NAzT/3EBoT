@@ -17,6 +17,24 @@ void NTPModule::configWebServer()
   static NTPModule *that = this;
 }
 
+String NTPModule::getTimeString() {
+  String timeString = "";
+  unsigned long _epoch = epoch+25200;
+  timeString += ((_epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
+  timeString += (':');
+  if ( ((_epoch % 3600) / 60) < 10 ) {
+    timeString+=('0');
+  }
+  timeString+= ((_epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
+  timeString+= (':');
+  if ( (_epoch % 60) < 10 ) {
+    // In the first 10 seconds of each minute, we'll want a leading '0'
+    timeString+= ('0');
+  }
+  timeString+=(_epoch % 60); // print the second
+  return timeString;
+}
+
 void NTPModule::loop() {
   interval.every_ms(500, [&]() {
     WiFi.hostByName(ntpServerName, timeServerIP);

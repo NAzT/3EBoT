@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <CMMC_Sensor.h>
+#include <CMMC_Interval.h>
 #include <Adafruit_BME280.h>
 
 class SensorModule: public CMMC_Module {
@@ -22,6 +23,7 @@ class SensorModule: public CMMC_Module {
     char _tempString[10];
     char _humidString[10];
     CMMC_SENSOR_DATA_T data1; 
+    CMMC_Interval interval;
 };
 
 #endif

@@ -1,5 +1,8 @@
 #include "LCDModule.h"
+#include "NTPModule.h"
 #include "logo.h"
+
+extern NTPModule* ntpModule;
 
 void LCDModule::displayLogo() {
     u8g2->firstPage();
@@ -84,5 +87,16 @@ void LCDModule::setup()
 }
 
 void LCDModule::loop() {
-
+  interval.every_ms(1000, [&]() {
+    u8g2->firstPage();
+    do
+    {
+      u8g2->setFont(u8g2_font_ncenB10_tr);
+      u8g2->setCursor(0, 11);
+      u8g2->print("3E-BOT");
+      u8g2->setFont(u8g2_font_ncenB08_tr);
+      u8g2->setCursor(0, 25);
+      u8g2->print(ntpModule->getTimeString());
+    } while (u8g2->nextPage()); 
+  }); 
 } 

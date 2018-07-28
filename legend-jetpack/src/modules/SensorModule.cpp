@@ -32,8 +32,11 @@ void SensorModule::setup()
 
 void SensorModule::loop() 
 { 
-  data1.field1 = bme->readTemperature();
-  data1.field2 = bme->readHumidity();
-  data1.field3 = bme->readPressure() / 100.0;
-  data1.field4 = bme->readAltitude(1013.25);
+  interval.every_ms(5000, [&]() {
+    Serial.println("read sensor...");
+    data1.field1 = bme->readTemperature();
+    data1.field2 = bme->readHumidity();
+    data1.field3 = bme->readPressure() / 100.0;
+    data1.field4 = bme->readAltitude(1013.25); 
+  });
 }

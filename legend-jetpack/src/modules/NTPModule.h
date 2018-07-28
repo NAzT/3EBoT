@@ -14,6 +14,7 @@ class NTPModule: public CMMC_Module {
     void isLongPressed(); 
     void configLoop();
     void printTime();
+    String getTimeString();
   protected:
     void configWebServer();
     void sendNTPpacket(IPAddress& address);
