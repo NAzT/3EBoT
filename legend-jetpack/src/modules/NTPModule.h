@@ -13,6 +13,7 @@ class NTPModule: public CMMC_Module {
     void loop(); 
     void isLongPressed(); 
     void configLoop();
+    void printTime();
   protected:
     void configWebServer();
     void sendNTPpacket(IPAddress& address);
@@ -24,6 +25,10 @@ class NTPModule: public CMMC_Module {
     byte packetBuffer[ NTP_PACKET_SIZE]; 
     WiFiUDP udp;
     CMMC_Interval interval;
+    CMMC_Interval interval2;
+    unsigned long epoch;
+    unsigned long unix;
+    unsigned long lastUpdateMs;
 };
 
 #endif
