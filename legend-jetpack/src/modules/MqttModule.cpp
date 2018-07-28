@@ -8,7 +8,7 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
   this->_serverPtr = server;
   this->_managerPtr = new CMMC_ConfigManager(MQTT_CONFIG_FILE);
   this->_managerPtr->init();
-  this->_managerPtr->load_config([&](JsonObject *root, const char *content) {
+  this->_managerPtr->load_config([&](JsonObject * root, const char *content) {
     if (root == NULL)
     {
       Serial.print("mqtt.json failed. >");
@@ -32,7 +32,8 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
                                   (*root)["deviceName"],
                                   (*root)["prefix"], // [6]
                                   (*root)["lwt"],
-                                  (*root)["publishRateSecond"]};
+                                  (*root)["publishRateSecond"]
+                                 };
 
     if (mqtt_configs[0] != NULL)
     {
@@ -75,7 +76,7 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 void MqttModule::configWebServer()
 {
   static MqttModule *that = this;
-  _serverPtr->on(this->path, HTTP_POST, [&](AsyncWebServerRequest *request) {
+  _serverPtr->on(this->path, HTTP_POST, [&](AsyncWebServerRequest * request) {
     String output = that->saveConfig(request, this->_managerPtr);
     request->send(200, "application/json", output);
   });
@@ -88,28 +89,10 @@ void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
-
-  Wire.begin(4, 5);
-  bme = new Adafruit_BME280();
-  bool bmeStatus;
-  bmeStatus = bme->begin(0x76);
-  if (!bmeStatus) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-  }
 };
 
 void MqttModule::loop()
 {
-
-  data1.field1 = bme->readTemperature();
-  data1.field2 = bme->readHumidity();
-  data1.field3 = bme->readPressure() / 100.0;
-  data1.field4 = bme->readAltitude(1013.25);
-
-  if (data1.field1 <= 0 || data1.field1 >= 100) {
-  }
-
-  
   mqtt->loop();
 };
 
@@ -119,7 +102,7 @@ MqttConnector *MqttModule::init_mqtt()
 {
   this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT);
 
-  mqtt->on_connecting([&](int counter, bool *flag) {
+  mqtt->on_connecting([&](int counter, bool * flag) {
     Serial.printf("[%lu] MQTT CONNECTING.. \r\n", counter);
     if (counter >= MQTT_CONNECT_TIMEOUT)
     {
@@ -128,7 +111,7 @@ MqttConnector *MqttModule::init_mqtt()
     delay(1000);
   });
 
-  mqtt->on_prepare_configuration([&](MqttConnector::Config *config) -> void {
+  mqtt->on_prepare_configuration([&](MqttConnector::Config * config) -> void {
     Serial.printf("lwt = %lu\r\n", MQTT_LWT);
     config->clientId = MQTT_CLIENT_ID;
     config->channelPrefix = MQTT_PREFIX;
@@ -180,7 +163,7 @@ MqttConnector *MqttModule::init_mqtt()
 
 void MqttModule::register_receive_hooks(MqttConnector *mqtt)
 {
-  mqtt->on_subscribe([&](MQTT::Subscribe *sub) -> void {
+  mqtt->on_subscribe([&](MQTT::Subscribe * sub) -> void {
     Serial.printf("onSubScribe myName = %s \r\n", DEVICE_NAME.c_str());
     sub->add_topic(MQTT_PREFIX + DEVICE_NAME + String("/$/+"));
     sub->add_topic(MQTT_PREFIX + MQTT_CLIENT_ID + String("/$/+"));
@@ -191,7 +174,7 @@ void MqttModule::register_receive_hooks(MqttConnector *mqtt)
 
   mqtt->on_before_message_arrived_once([&](void) {});
 
-  mqtt->on_message([&](const MQTT::Publish &pub) {});
+  mqtt->on_message([&](const MQTT::Publish & pub) {});
 
   mqtt->on_after_message_arrived([&](String topic, String cmd, String payload) {
     // Serial.printf("recv topic: %s\r\n", topic.c_str());
@@ -243,44 +226,18 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
   mqtt->on_before_prepare_data([&](void) {
   });
 
-  mqtt->on_prepare_data([&](JsonObject *root) {
+  mqtt->on_prepare_data([&](JsonObject * root) {
     JsonObject &data = (*root)["d"];
     JsonObject &info = (*root)["info"];
     // data["appVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-
-    if (data1.field1 >= 0 && data1.field1 <= 100)
-    {
-      data["temp"] = data1.field1;
-    }
-
-    if (data1.field2 >= 0 && data1.field2 <= 100)
-    {
-      data["humid"] = data1.field2;
-    }
-
-    if (data1.field3 >= 0 && data1.field3 <= 10000)
-    {
-      data["pressure"] = data1.field3;
-    }
-
-    if (data1.field4 >= 0 && data1.field4 <= 10000)
-    {
-      data["altitude"] = data1.field4;
-    }
     data["updateInterval"] = PUBLISH_EVERY;
     // Serial.printf("field1 = %lu \r\n", sensorData.field1);
-    // Serial.printf("field2 = %lu \r\n", sensorData.field2);
-    // Serial.printf("field3 = %lu \r\n", sensorData.field3);
-    // Serial.printf("field4 = %lu \r\n", sensorData.field4);
-    // Serial.printf("field5 = %lu \r\n", sensorData.field5);
-    // Serial.printf("field6 = %lu \r\n", sensorData.field6);
     Serial.println("PUBLISHING...!");
-    // Serial.printf("temp = %d\r\n", bme->readTemperature());
   }, PUBLISH_EVERY);
 
-  mqtt->on_after_prepare_data([&](JsonObject *root) {
+  mqtt->on_after_prepare_data([&](JsonObject * root) {
     /**************
       JsonObject& data = (*root)["d"];
       data.remove("version");
