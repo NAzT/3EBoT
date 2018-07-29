@@ -9,6 +9,7 @@ CMMC_Legend os;
 
 int temp;
 
+// Blue Display
 // 3EBOT1
 // mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i j8pShiIYNIerG8n6 -u "1Xzlmdf3MNFjRgu" -P "2bugw3+nLiKqzxZxmIUkfEbCPtU=" -p 1883 -d
 // 3EBOT2
@@ -50,6 +51,10 @@ int temp;
 // 3EBOT20
 //mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i 5I2NXUE7Js3UymMs -u "1Xzlmdf3MNFjRgu" -P "dpZGcmDsjxZGV3vfGfcPSc55au4=" -p 1883 -d
 
+
+// Yellow Display
+// 3EBOT21
+//mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i Qu2epqNd7gqDx41u -u "1Xzlmdf3MNFjRgu" -P "4/3E2qLB4h/OBmScAf+8FzYp4Nk=" -p 1883 -d
 
 // debug
 // mosquitto_sub -t "/3EBot/gearname/#" -h gb.netpie.io -i LOuN74G9Hh0WHk3R -u "1Xzlmdf3MNFjRgu" -P "q+t0cKm1J4VJnzaQEtT4T1u38J8=" -p 1883 -d
