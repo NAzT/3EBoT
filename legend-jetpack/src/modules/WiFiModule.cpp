@@ -1,6 +1,31 @@
 #include "WiFiModule.h"
+#include "LCDModule.h"
 
 #define WIFI_CONFIG_FILE "/wifi.json"
+
+extern LCDModule* lcdModule;
+
+
+void WiFiModule::isLongPressed() {
+  if (digitalRead(15) == HIGH) {
+    lcdModule->displayLogo();
+    Serial.println("15 PRESSED.");
+    while(digitalRead(15) == HIGH) {
+      delay(10); 
+    } 
+    SPIFFS.remove("/enabled");
+    digitalWrite(0, HIGH);
+    delay(1000);
+    ESP.restart();
+  } 
+}
+void WiFiModule::configLoop() {
+  isLongPressed();
+}
+
+void WiFiModule::configSetup() {
+  lcdModule->displayConfigWiFi(); 
+}
 
 void WiFiModule::config(CMMC_System *os, AsyncWebServer *server)
 {
@@ -39,48 +64,16 @@ void WiFiModule::configWebServer()
     String output = that->saveConfig(request, this->_managerPtr);
     request->send(200, "application/json", output);
   });
-}
-
-void WiFiModule::isLongPressed()
-{
-  uint32_t prev = millis();
-  while (digitalRead(15) == HIGH)
-  {
-    delay(50);
-    if ((millis() - prev) > 5L * 1000L)
-    {
-      u8g2->firstPage();
-      do
-      {
-        u8g2->setFont(u8g2_font_ncenB10_tr);
-        u8g2->setCursor(0, 11);
-        u8g2->print("3E-BOT");
-        u8g2->setFont(u8g2_font_ncenB08_tr);
-        u8g2->setCursor(0, 25);
-        u8g2->print(" LONG PRESSED.");
-      } while (u8g2->nextPage());
-
-      Serial.println("LONG PRESSED.");
-      while (digitalRead(15) == HIGH)
-      {
-        delay(10);
-      }
-      SPIFFS.remove("/enabled");
-      Serial.println("being restarted.");
-      delay(1000);
-      ESP.restart();
-    }
-  }
-}
+} 
 
 void WiFiModule::setup()
 {
-  u8g2 = new U8G2_ST7920_128X64_1_SW_SPI(U8G2_R0, /* clock=*/14, /* data=*/13, /* CS=*/12);
-  u8g2->begin();
   _init_sta();
 }
 
-void WiFiModule::loop() {}
+void WiFiModule::loop() {
+
+}
 
 void WiFiModule::_init_sta()
 {
@@ -91,22 +84,14 @@ void WiFiModule::_init_sta()
   delay(20);
   WiFi.begin(sta_ssid, sta_pwd);
 
+  int counter = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
-    u8g2->firstPage();
-    do
-    {
-      u8g2->setFont(u8g2_font_ncenB10_tr);
-      u8g2->setCursor(0, 11);
-      u8g2->print("3E-BOT");
-      u8g2->setFont(u8g2_font_ncenB08_tr);
-      u8g2->setCursor(0, 25);
-      u8g2->print(" Connecting to ");
-      u8g2->print(sta_ssid);
-    } while (u8g2->nextPage());
-    Serial.printf("Connecting to %s:%s\r\n", sta_ssid, sta_pwd);
+    Serial.printf("Connecting to %s:%s\r\n", sta_ssid, sta_pwd); 
+    lcdModule->displayConnectingWiFi(sta_ssid, counter++);
     isLongPressed();
-    delay(300);
+    delay(500);
   }
+  lcdModule->displayWiFiConnected();
   Serial.println("WiFi Connected.");
 }
