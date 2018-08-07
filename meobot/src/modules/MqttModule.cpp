@@ -1,4 +1,5 @@
-#include "MqttModule.h"
+#include <CMMC_Legend.h>
+#include "MqttModule.h" 
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 
@@ -89,6 +90,15 @@ void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
+  static MqttModule *that;
+  that = this;
+  mqttMessageTicker.attach_ms(1000, []() {
+    that->mqttMessageTimeout++;
+    if (that->mqttMessageTimeout > (unsigned int)that->PUBLISH_EVERY * 2) {
+      digitalWrite(0, HIGH);
+      ESP.restart();
+    }
+  });
 };
 
 void MqttModule::loop()
@@ -100,8 +110,7 @@ void MqttModule::loop()
 
 MqttConnector *MqttModule::init_mqtt()
 {
-  this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT);
-
+  this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT); 
   mqtt->on_connecting([&](int counter, bool * flag) {
     Serial.printf("[%lu] MQTT CONNECTING.. \r\n", counter);
     if (counter >= MQTT_CONNECT_TIMEOUT)
@@ -170,7 +179,7 @@ void MqttModule::register_receive_hooks(MqttConnector *mqtt)
     sub->add_topic(MQTT_PREFIX + DEVICE_NAME + String("/status"));
     Serial.println("done on_subscribe...");
     Serial.printf("publish every %lu s\r\n", PUBLISH_EVERY);
-  });
+  }); 
 
   mqtt->on_before_message_arrived_once([&](void) {}); 
   mqtt->on_message([&](const MQTT::Publish & pub) {}); 
@@ -178,6 +187,7 @@ void MqttModule::register_receive_hooks(MqttConnector *mqtt)
     // Serial.printf("recv topic: %s\r\n", topic.c_str());
     // Serial.printf("recv cmd: %s\r\n", cmd.c_str());
     // Serial.printf("payload: %s\r\n", payload.c_str());
+    mqttMessageTimeout = 0;
     if (cmd == "$/command")
     {
       if (payload == "ON")
@@ -225,11 +235,10 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
   mqtt->on_prepare_data([&](JsonObject * root) {
     JsonObject &data = (*root)["d"];
     JsonObject &info = (*root)["info"];
-    // data["appVersion"] = LEGEND_APP_VERSION;
+    data["frameWorkVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
     data["updateInterval"] = PUBLISH_EVERY;
-    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
     Serial.println("PUBLISHING...!");
   }, PUBLISH_EVERY);
 
