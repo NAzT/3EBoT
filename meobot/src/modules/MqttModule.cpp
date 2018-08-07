@@ -242,9 +242,17 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     data["appVersion"] = String(MEOBOT_VERSION).toFloat();
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    data["temperature_c"] = sensorModule->getTemperature();
-    data["humidity_percent_rh"] = sensorModule->getHumidity();
+    if (sensorModule->getTemperature() > 0.0) {
+      data["temperature_c"] = sensorModule->getTemperature(); 
+    }
+
+    if (sensorModule->getHumidity() > 0.0) {
+      data["humidity_percent_rh"] = sensorModule->getHumidity();
+    }
+
     data["updateInterval"] = PUBLISH_EVERY;
+    data["mqttMessageTimeout"] = mqttMessageTimeout;
+
     Serial.println("PUBLISHING...!");
   }, PUBLISH_EVERY);
 
