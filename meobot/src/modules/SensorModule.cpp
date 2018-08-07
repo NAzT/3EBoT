@@ -113,10 +113,10 @@ String SensorModule::getHumidityString() {
   return String((int)_humidity); 
 }
 
-String SensorModule::getTemperature() { 
-  return String(_temperature); 
+float SensorModule::getTemperature() { 
+  return _temperature; 
 }
 
-String SensorModule::getHumidity() { 
-  return String(_humidity); 
+float SensorModule::getHumidity() { 
+  return _humidity; 
 }
