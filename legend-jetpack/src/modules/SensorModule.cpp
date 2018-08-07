@@ -93,11 +93,12 @@ void SensorModule::loop()
       _pressure = median(pressure_array, idx+1);
     }
     else {
-      Serial.println("CASE-1");
+      Serial.println("CASE-2");
       _temperature = median(temp_array, MAX_ARRAY);
       _humidity = median(humid_array, MAX_ARRAY);
       _pressure = median(pressure_array, MAX_ARRAY);
     }
+    Serial.printf("temp=%.2f humid=%.2f\r\n", _temperature, _humidity);
     counter++;
   });
 }

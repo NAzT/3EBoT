@@ -23,7 +23,7 @@ void NTPModule::loop() {
     sendNTPpacket(timeServerIP); // send an NTP packet to a time server
     int cb = udp.parsePacket();
     if (!cb) {
-      // Serial.println("no packet yet");
+      Serial.println("no packet yet");
     }
     else {
       udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer 
@@ -37,9 +37,9 @@ void NTPModule::loop() {
     }
   });
 
-  // interval2.every_ms(1000, [&]() {
-  //   printTime(); 
-  // });
+  interval2.every_ms(1000, [&]() {
+    printTime(); 
+  });
 }
 
 void NTPModule::printTime() {

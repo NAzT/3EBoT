@@ -307,7 +307,7 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
       // delay(1000);
       // ESP.restart();
     }
-  }, [](AsyncWebServerRequest * request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  }, [&](AsyncWebServerRequest * request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
     //Upload handler chunks in data
     if (!index) { // if index == 0 then this is the first frame of data
       SPIFFS.end();
@@ -332,6 +332,8 @@ void CMMC_Legend::setupWebServer(AsyncWebServer *server, AsyncWebSocket *ws, Asy
     if (final) { // if the final flag is set then this is the last frame of data
       if (Update.end(true)) { //true to set the size to the current progress
         Serial.printf("Update Success: %u B\nRebooting...\n", index + len);
+          that->stopFlag = true;
+          stopFlag = true;
         blinker->blink(1000);
       } else {
         Update.printError(Serial);

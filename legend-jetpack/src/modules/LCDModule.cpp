@@ -17,7 +17,7 @@ void LCDModule::displayLogo() {
     
     u8g2->setCursor(40, 46);
     u8g2->setFont(u8g2_font_10x20_te);
-    u8g2->print("v1.3"); 
+    u8g2->print("v1.0"); 
   } while (u8g2->nextPage()); 
   delay(2000);
 }

@@ -22,7 +22,7 @@ class NTPModule: public CMMC_Module {
   private:
     unsigned int localPort = 2390;
     IPAddress timeServerIP;
-    const char* ntpServerName = "time.nist.gov"; 
+    const char* ntpServerName = "th.pool.ntp.org"; 
     byte packetBuffer[ NTP_PACKET_SIZE]; 
     WiFiUDP udp;
     CMMC_Interval interval;
