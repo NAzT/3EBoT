@@ -4,6 +4,7 @@
 extern SensorModule* sensorModule;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
+static const char* MEOBOT_VERSION;
 
 void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 {

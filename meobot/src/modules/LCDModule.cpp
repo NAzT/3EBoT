@@ -5,6 +5,7 @@
 
 extern NTPModule* ntpModule;
 extern SensorModule* sensorModule;
+static const char* MEOBOT_VERSION;
 
 void LCDModule::displayLogo() {
     u8g2->firstPage();
@@ -17,7 +18,8 @@ void LCDModule::displayLogo() {
     
     u8g2->setCursor(40, 46);
     u8g2->setFont(u8g2_font_10x20_te);
-    u8g2->print("v1.0"); 
+    u8g2->print("v"); 
+    u8g2->print(MEOBOT_VERSION); 
   } while (u8g2->nextPage()); 
   delay(2000);
 }

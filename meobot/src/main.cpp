@@ -8,12 +8,14 @@
 #include "modules/MqttModule.h"
 #include "modules/SensorModule.h"
 
-CMMC_Legend os;
+static const char* MEOBOT_VERSION = "1.1";
 
+CMMC_Legend os; 
 LCDModule *lcdModule;
 NTPModule *ntpModule;
 SensorModule *sensorModule;
 WiFiModule* wifiModule;
+
 
 void setup()
 { 
@@ -30,6 +32,7 @@ void setup()
 
   os.setup();
   Serial.printf("APP VERSION: %s\r\n", LEGEND_APP_VERSION);
+  Serial.printf("MEOBOT VERSION: %s\r\n", MEOBOT_VERSION);
 }
 
 void loop()
