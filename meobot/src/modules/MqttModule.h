@@ -5,6 +5,7 @@
 #include <MqttConnector.h>
 #include <CMMC_Sensor.h>
 #include <CMMC_Module.h>
+#include <Ticker.h>
 
 class MqttModule : public CMMC_Module
 {
@@ -22,6 +23,8 @@ protected:
 
 private:
   MqttConnector *mqtt;
+  Ticker mqttMessageTicker; 
+  unsigned int mqttMessageTimeout = 0;
   String MQTT_HOST;
   String MQTT_USERNAME;
   String MQTT_PASSWORD;
@@ -29,10 +32,9 @@ private:
   String MQTT_PREFIX;
   String DEVICE_NAME;
   int MQTT_PORT;
-  int PUBLISH_EVERY;
-  int MQTT_CONNECT_TIMEOUT;
-  bool MQTT_LWT;
-
+  int PUBLISH_EVERY = 60;
+  int MQTT_CONNECT_TIMEOUT = 10;
+  bool MQTT_LWT; 
   unsigned long previousMillis = 0;
 };
 

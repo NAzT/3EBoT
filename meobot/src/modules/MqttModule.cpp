@@ -1,7 +1,7 @@
-#include "MqttModule.h"
+#include <CMMC_Legend.h>
+#include "MqttModule.h" 
 #include "SensorModule.h"
-
-extern SensorModule *sensorModule;
+extern SensorModule* sensorModule;
 
 #define MQTT_CONFIG_FILE "/mymqtt.json"
 
@@ -11,7 +11,7 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
   this->_serverPtr = server;
   this->_managerPtr = new CMMC_ConfigManager(MQTT_CONFIG_FILE);
   this->_managerPtr->init();
-  this->_managerPtr->load_config([&](JsonObject *root, const char *content) {
+  this->_managerPtr->load_config([&](JsonObject * root, const char *content) {
     if (root == NULL)
     {
       Serial.print("mqtt.json failed. >");
@@ -35,7 +35,8 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
                                   (*root)["deviceName"],
                                   (*root)["prefix"], // [6]
                                   (*root)["lwt"],
-                                  (*root)["publishRateSecond"]};
+                                  (*root)["publishRateSecond"]
+                                 };
 
     if (mqtt_configs[0] != NULL)
     {
@@ -50,17 +51,14 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
       lwt = String(mqtt_configs[7]).toInt();
       pubEveryS = String(mqtt_configs[8]).toInt();
 
-      if (strcmp(mqtt_device_name, "") == 0)
-      {
+      if (strcmp(mqtt_device_name, "") == 0) {
         sprintf(mqtt_device_name, "%08x", ESP.getChipId());
       }
-      else
-      {
+      else {
         Serial.printf("DEVICE NAME = %s\r\n", mqtt_device_name);
       }
 
-      if (strcmp(mqtt_clientId, "") == 0)
-      {
+      if (strcmp(mqtt_clientId, "") == 0) {
         sprintf(mqtt_clientId, "%08x", ESP.getChipId());
       }
     }
@@ -81,20 +79,28 @@ void MqttModule::config(CMMC_System *os, AsyncWebServer *server)
 void MqttModule::configWebServer()
 {
   static MqttModule *that = this;
-  _serverPtr->on(this->path, HTTP_POST, [&](AsyncWebServerRequest *request) {
+  _serverPtr->on(this->path, HTTP_POST, [&](AsyncWebServerRequest * request) {
     String output = that->saveConfig(request, this->_managerPtr);
     request->send(200, "application/json", output);
   });
 }
 
-void MqttModule::configLoop()
-{
+void MqttModule::configLoop() {
 }
 
 void MqttModule::setup()
 {
   Serial.println("MqttModule::setup");
   init_mqtt();
+  static MqttModule *that;
+  that = this;
+  mqttMessageTicker.attach_ms(1000, []() {
+    that->mqttMessageTimeout++;
+    if (that->mqttMessageTimeout > (unsigned int)that->PUBLISH_EVERY * 2) {
+      digitalWrite(0, HIGH);
+      ESP.restart();
+    }
+  });
 };
 
 void MqttModule::loop()
@@ -106,9 +112,8 @@ void MqttModule::loop()
 
 MqttConnector *MqttModule::init_mqtt()
 {
-  this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT);
-
-  mqtt->on_connecting([&](int counter, bool *flag) {
+  this->mqtt = new MqttConnector(this->MQTT_HOST.c_str(), this->MQTT_PORT); 
+  mqtt->on_connecting([&](int counter, bool * flag) {
     Serial.printf("[%lu] MQTT CONNECTING.. \r\n", counter);
     if (counter >= MQTT_CONNECT_TIMEOUT)
     {
@@ -117,7 +122,7 @@ MqttConnector *MqttModule::init_mqtt()
     delay(1000);
   });
 
-  mqtt->on_prepare_configuration([&](MqttConnector::Config *config) -> void {
+  mqtt->on_prepare_configuration([&](MqttConnector::Config * config) -> void {
     Serial.printf("lwt = %lu\r\n", MQTT_LWT);
     config->clientId = MQTT_CLIENT_ID;
     config->channelPrefix = MQTT_PREFIX;
@@ -169,21 +174,22 @@ MqttConnector *MqttModule::init_mqtt()
 
 void MqttModule::register_receive_hooks(MqttConnector *mqtt)
 {
-  mqtt->on_subscribe([&](MQTT::Subscribe *sub) -> void {
+  mqtt->on_subscribe([&](MQTT::Subscribe * sub) -> void {
     Serial.printf("onSubScribe myName = %s \r\n", DEVICE_NAME.c_str());
     sub->add_topic(MQTT_PREFIX + DEVICE_NAME + String("/$/+"));
     sub->add_topic(MQTT_PREFIX + MQTT_CLIENT_ID + String("/$/+"));
     sub->add_topic(MQTT_PREFIX + DEVICE_NAME + String("/status"));
     Serial.println("done on_subscribe...");
     Serial.printf("publish every %lu s\r\n", PUBLISH_EVERY);
-  });
+  }); 
 
-  mqtt->on_before_message_arrived_once([&](void) {});
-  mqtt->on_message([&](const MQTT::Publish &pub) {});
+  mqtt->on_before_message_arrived_once([&](void) {}); 
+  mqtt->on_message([&](const MQTT::Publish & pub) {}); 
   mqtt->on_after_message_arrived([&](String topic, String cmd, String payload) {
     // Serial.printf("recv topic: %s\r\n", topic.c_str());
     // Serial.printf("recv cmd: %s\r\n", cmd.c_str());
     // Serial.printf("payload: %s\r\n", payload.c_str());
+    mqttMessageTimeout = 0;
     if (cmd == "$/command")
     {
       if (payload == "ON")
@@ -228,23 +234,19 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
   mqtt->on_before_prepare_data([&](void) {
   });
 
-  mqtt->on_prepare_data([&](JsonObject *root) {
+  mqtt->on_prepare_data([&](JsonObject * root) {
     JsonObject &data = (*root)["d"];
     JsonObject &info = (*root)["info"];
-    // data["appVersion"] = LEGEND_APP_VERSION;
+    data["frameWorkVersion"] = LEGEND_APP_VERSION;
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
-    data["updateInterval"] = PUBLISH_EVERY;
-    // data["temperature_c"] = sensorModule->getTemperatureString();
-    // data["humidity_percent_rh"] = sensorModule->getHumidityString();
     data["temperature_c"] = sensorModule->getTemperature();
     data["humidity_percent_rh"] = sensorModule->getHumidity();
-    // Serial.printf("field1 = %lu \r\n", sensorData.field1);
+    data["updateInterval"] = PUBLISH_EVERY;
     Serial.println("PUBLISHING...!");
-  },
-                        PUBLISH_EVERY);
+  }, PUBLISH_EVERY);
 
-  mqtt->on_after_prepare_data([&](JsonObject *root) {
+  mqtt->on_after_prepare_data([&](JsonObject * root) {
     /**************
       JsonObject& data = (*root)["d"];
       data.remove("version");
