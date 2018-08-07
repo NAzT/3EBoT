@@ -112,3 +112,11 @@ String SensorModule::getTemperatureString() {
 String SensorModule::getHumidityString() { 
   return String((int)_humidity); 
 }
+
+String SensorModule::getTemperature() { 
+  return String(_temperature); 
+}
+
+String SensorModule::getHumidity() { 
+  return String(_humidity); 
+}

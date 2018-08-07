@@ -19,6 +19,8 @@ class SensorModule: public CMMC_Module {
     void configLoop();
     String getTemperatureString();
     String getHumidityString();
+    String getTemperature();
+    String getHumidity();
 
   protected:
     void configWebServer();
