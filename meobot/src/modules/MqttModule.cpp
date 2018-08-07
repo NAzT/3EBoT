@@ -97,7 +97,7 @@ void MqttModule::setup()
   that = this;
   mqttMessageTicker.attach_ms(1000, []() {
     that->mqttMessageTimeout++;
-    if (that->mqttMessageTimeout > (unsigned int)that->PUBLISH_EVERY * 2) {
+    if ( (that->mqttMessageTimeout) > (unsigned int)that->PUBLISH_EVERY/1000 * 2.5) {
       digitalWrite(0, HIGH);
       ESP.restart();
     }
@@ -250,7 +250,7 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
       data["humidity_percent_rh"] = sensorModule->getHumidity();
     }
 
-    data["updateInterval"] = PUBLISH_EVERY;
+    data["PUBLISH_EVERY_S"] = PUBLISH_EVERY/1000;
     data["mqttMessageTimeout"] = mqttMessageTimeout;
 
     Serial.println("PUBLISHING...!");
