@@ -239,6 +239,7 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     JsonObject &data = (*root)["d"];
     JsonObject &info = (*root)["info"];
     data["frameWorkVersion"] = LEGEND_APP_VERSION;
+    data["appVersion"] = String(MEOBOT_VERSION).toFloat();
     data["myName"] = DEVICE_NAME;
     data["millis"] = millis();
     data["temperature_c"] = sensorModule->getTemperature();
