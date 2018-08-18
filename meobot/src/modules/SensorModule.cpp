@@ -82,15 +82,26 @@ void SensorModule::setup()
   bme = new Adafruit_BME280();
   bool bmeStatus;
   bmeStatus = bme->begin(0x76);
-  if (!bmeStatus)
-  {
+  if (!bmeStatus) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
   }
+
+  ads = new Adafruit_ADS1115(0x48); 
+  ads->setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV 
+  ads->setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+  ads->begin(); 
 }
 
 void SensorModule::loop()
 {
   interval.every_ms(5000, [&]() {
+    int16_t adc0, adc1, adc2, adc3;
+
+    adc0 = ads->readADC_SingleEnded(0);
+    adc1 = ads->readADC_SingleEnded(1);
+    adc2 = ads->readADC_SingleEnded(2);
+    adc3 = ads->readADC_SingleEnded(3);
+
     int idx = counter % MAX_ARRAY;
     temp_array[idx] = bme->readTemperature();
     humid_array[idx] = bme->readHumidity();

@@ -253,6 +253,11 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     data["PUBLISH_EVERY_S"] = PUBLISH_EVERY/1000;
     data["mqttMessageTimeout"] = mqttMessageTimeout;
 
+    data["adc0"] = sensorModule->adc0;
+    data["adc1"] = sensorModule->adc1;
+    data["adc2"] = sensorModule->adc2;
+    data["adc3"] = sensorModule->adc3;
+
     Serial.println("PUBLISHING...!");
   }, PUBLISH_EVERY);
 
