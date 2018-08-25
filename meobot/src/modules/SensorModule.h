@@ -10,9 +10,10 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_ADS1015.h> 
 
-const int MAX_ARRAY = 5;
+const int MAX_ARRAY = 3;
 class SensorModule: public CMMC_Module {
   public:
+    float soil_moisture_percent = 0.0;
     void config(CMMC_System *os, AsyncWebServer* server); 
     void setup();
     void loop(); 
@@ -22,11 +23,8 @@ class SensorModule: public CMMC_Module {
     String getHumidityString();
     float getTemperature();
     float getHumidity();
-
-    int16_t adc0;
-    int16_t adc1;
-    int16_t adc2;
-    int16_t adc3; 
+    float getAnalog(int );
+    int soil_enable = false; 
   protected:
     void configWebServer();
   private:
@@ -36,11 +34,16 @@ class SensorModule: public CMMC_Module {
     
     float temp_array[MAX_ARRAY] = { 0.0 };
     float humid_array[MAX_ARRAY] = { 0.0 };
-    float pressure_array[MAX_ARRAY] = { 0.0 };
+    float pressure_array[MAX_ARRAY] = { 0.0 }; 
+    float adc0_array[MAX_ARRAY] = { 0 };
 
     float _temperature;
     float _humidity;
     float _pressure; 
+    float _adc0;
+    int soil_max;
+    int soil_min;
+    int soil_moisture;
 
     unsigned long counter = 0;
     Adafruit_ADS1115 *ads;

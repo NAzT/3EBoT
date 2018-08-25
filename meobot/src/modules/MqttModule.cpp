@@ -253,10 +253,16 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     data["PUBLISH_EVERY_S"] = PUBLISH_EVERY/1000;
     data["mqttMessageTimeout"] = mqttMessageTimeout;
 
-    data["adc0"] = sensorModule->adc0;
-    data["adc1"] = sensorModule->adc1;
-    data["adc2"] = sensorModule->adc2;
-    data["adc3"] = sensorModule->adc3;
+    if (sensorModule->soil_moisture_percent > 0.0) {
+      data["soil_moisture_raw"] = sensorModule->getAnalog(0); 
+      data["soil_moisture_percent"] = sensorModule->soil_moisture_percent; 
+    }
+
+    // Serial.printf("sensorModule->adc0 = %d\r\n", sensorModule->adc0);
+    // Serial.printf("sensorModule->adc1 = %d\r\n", sensorModule->adc1);
+    // Serial.printf("sensorModule->adc2 = %d\r\n", sensorModule->adc2);
+    // Serial.printf("sensorModule->adc3 = %d\r\n", sensorModule->adc3);
+
 
     Serial.println("PUBLISHING...!");
   }, PUBLISH_EVERY);

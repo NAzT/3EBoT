@@ -3,24 +3,33 @@
 
 #define WIFI_CONFIG_FILE "/wifi.json"
 
-extern LCDModule* lcdModule;
-
+extern LCDModule* lcdModule; 
 
 void WiFiModule::isLongPressed() {
   if (digitalRead(15) == HIGH) {
-    lcdModule->displayLogo();
-    Serial.println("15 PRESSED.");
+    lcdModule->displayLogoWaitReboot();
     while(digitalRead(15) == HIGH) {
       delay(10); 
-    } 
+    }
     SPIFFS.remove("/enabled");
     digitalWrite(0, HIGH);
-    delay(1000);
+    delay(2000);
     ESP.restart();
-  } 
+  }
 }
+
 void WiFiModule::configLoop() {
-  isLongPressed();
+  if (digitalRead(15) == HIGH) {
+    lcdModule->displayLogoWaitReboot();
+    while(digitalRead(15) == HIGH) {
+      delay(10); 
+    }
+    File f = SPIFFS.open("/enabled", "a+");
+    f.close();
+    digitalWrite(0, HIGH);
+    delay(100);
+    ESP.restart();
+  }
 }
 
 void WiFiModule::configSetup() {

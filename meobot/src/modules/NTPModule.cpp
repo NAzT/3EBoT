@@ -18,12 +18,14 @@ void NTPModule::setup() {
 }
 
 void NTPModule::loop() {
-  interval.every_ms(500, [&]() {
+  interval.every_ms(5000, [&]() {
     WiFi.hostByName(ntpServerName, timeServerIP);
     sendNTPpacket(timeServerIP); // send an NTP packet to a time server
     int cb = udp.parsePacket();
     if (!cb) {
-      Serial.println("no packet yet");
+      // Serial.println("no packet yet");
+      // epoch = unix + (millis() - lastUpdateMs)/100; 
+      // epoch  = unix + (millis() - lastUpdateMs)/1000; 
     }
     else {
       udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer 
@@ -37,8 +39,8 @@ void NTPModule::loop() {
     }
   });
 
-  interval2.every_ms(1000, [&]() {
-    printTime(); 
+  interval2.every_ms(200, [&]() {
+    // printTime(); 
   });
 }
 
@@ -95,12 +97,16 @@ String NTPModule::getTimeString() {
   if ( ((_epoch % 3600) / 60) < 10 ) {
     timeString+=('0');
   }
+
   timeString+= ((_epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
-  timeString+= (':');
-  if ( (_epoch % 60) < 10 ) {
-    // In the first 10 seconds of each minute, we'll want a leading '0'
-    timeString+= ('0');
+  // timeString+= (':');
+  // if ( (_epoch % 60) < 10 ) {
+  //   // In the first 10 seconds of each minute, we'll want a leading '0'
+  //   timeString+= ('0');
+  // }
+  // timeString+=(_epoch % 60); // print the second
+  if (epoch < 10000) {
+    timeString = "00:00";
   }
-  timeString+=(_epoch % 60); // print the second
   return timeString;
 }

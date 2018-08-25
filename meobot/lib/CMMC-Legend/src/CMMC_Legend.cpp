@@ -30,6 +30,7 @@ void CMMC_Legend::isLongPressed() {
   uint32_t prev = millis();
   while (digitalRead(15) == HIGH) {
     delay(50);
+    Serial.println("...isLongPressed..");
     if ( (millis() - prev) > 5L * 1000L) {
       Serial.println("LONG PRESSED.");
       blinker->blink(50);
@@ -118,17 +119,18 @@ void CMMC_Legend::init_network() {
         _modules[i]->configLoop();
         yield();
       } 
-      if ( (millis() - startConfigLoopAtMs) > 10L*60*1000) {
+      if ( (millis() - startConfigLoopAtMs) > 20L*60*1000) {
           setEnable(true);
           delay(100);
           ESP.restart();
       } 
     }
+
     SPIFFS.begin();
     File f = SPIFFS.open("/enabled", "a+");
-    Serial.println("stopAll");
+    blinker->blink(50);
     delay(200);;
-    ESP.restart();
+    ESP.restart(); 
   }
   else if (mode == RUN) {
     system_update_cpu_freq(80);

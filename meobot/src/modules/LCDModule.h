@@ -17,6 +17,7 @@ class LCDModule: public CMMC_Module {
     void displayConnectingWiFi(const char*, int count=0);
     void displayWiFiConnected();
     void displayLogo();
+    void displayLogoWaitReboot();
   protected:
     void configWebServer();
   private:

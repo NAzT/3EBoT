@@ -24,6 +24,22 @@ void LCDModule::displayLogo() {
   delay(2000);
 }
 
+void LCDModule::displayLogoWaitReboot() {
+    u8g2->firstPage();
+  do
+  {
+    u8g2->drawXBM(-10, 0, 128, 64, logo);
+    u8g2->setFont(u8g2_font_logisoso16_tr);
+    u8g2->setCursor(36, 28);
+    u8g2->print("3E-MeoBot"); 
+    
+    u8g2->setCursor(40, 46);
+    u8g2->setFont(u8g2_font_10x20_te);
+    u8g2->print("Reboot.."); 
+  } while (u8g2->nextPage()); 
+  delay(2000);
+}
+
 void LCDModule::displayConfigWiFi() {
   char strID[10];
   sprintf(strID, "%08x", ESP.getChipId());
@@ -71,15 +87,6 @@ void LCDModule::displayWiFiConnected() {
 }
 
 void LCDModule::configLoop() {
-  if (digitalRead(0) == LOW) {
-    while(digitalRead(0) == LOW) {
-      delay(10); 
-    } 
-    File f = SPIFFS.open("/enabled", "a+");
-    delay(100);
-    digitalWrite(0, HIGH);
-    ESP.restart();
-  }
 }
 
 void LCDModule::config(CMMC_System *os, AsyncWebServer *server)
@@ -191,27 +198,36 @@ void LCDModule::loop() {
   interval.every_ms(1000, [=]() {
     u8g2->firstPage();
     int factor = micros()%6;
-    factor = +5;
+    factor = +0;
     do
     {
       // u8g2->drawXBM(0,0,128,64, logo); 
+      u8g2->drawXBM(5, 5, 40, 32, cat); 
+      if (sensorModule->soil_enable) {
+        u8g2->setFont(u8g2_font_open_iconic_thing_1x_t); 
+        // u8g2->setCursor(110, 6);
+        u8g2->drawGlyph(100, 8, 64+8+6); 
+      }
+
+      int logoMargin = 40; 
       u8g2->setFont(u8g2_font_p01type_tn); 
-      u8g2->setCursor(90, 6);
+      u8g2->setCursor(110, 7);
       u8g2->print(ntpModule->getTimeString());
 
       u8g2->setFont(u8g2_font_siji_t_6x10);
-      u8g2->setCursor(10, 13);
-      u8g2->print("3E-MeoBot"); 
+      u8g2->setCursor(logoMargin+10, 16);
+      u8g2->print("3E-MeoBot");
 
       u8g2->setFont(u8g2_font_siji_t_6x10);
-      u8g2->setCursor(12, 24);
+      u8g2->setCursor(logoMargin+12, 27);
       u8g2->print("Weather"); 
 
-      u8g2->setCursor(12, 32);
+      u8g2->setCursor(logoMargin+12, 35);
       u8g2->print("station"); 
 
-      u8g2->setFont(u8g2_font_open_iconic_weather_4x_t);
-      u8g2->drawGlyph(84, 41, 64+factor);
+      u8g2->setFont(u8g2_font_open_iconic_all_2x_t);
+      u8g2->drawGlyph(74, 60, 152);
+
 
       int marginLeft = 6;
       u8g2->setFont(u8g2_font_logisoso16_tf);
@@ -219,7 +235,7 @@ void LCDModule::loop() {
       u8g2->print(sensorModule->getTemperatureString());
       u8g2->print("°C");
 
-      u8g2->setCursor(78+marginLeft, 60);
+      u8g2->setCursor(85+marginLeft, 60);
       u8g2->print(sensorModule->getHumidityString());
       u8g2->print("%"); 
     } while (u8g2->nextPage()); 
