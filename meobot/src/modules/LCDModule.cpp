@@ -195,55 +195,121 @@ void LCDModule::loop() {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x00, 0x00, 0x00, }; 
 
-  interval.every_ms(1000, [=]() {
+  interval.every_ms(1000, [&]() {
     u8g2->firstPage();
     int factor = micros()%6;
     factor = +0;
     ntpModule->toggle = !ntpModule->toggle;
     do
     {
-      // u8g2->drawXBM(0,0,128,64, logo); 
-      u8g2->drawXBM(5, 5, 40, 32, cat); 
       if (sensorModule->soil_enable) {
         u8g2->setFont(u8g2_font_open_iconic_thing_1x_t); 
-        u8g2->drawGlyph(100, 8, 64+8+9); 
+        u8g2->drawGlyph(100, 9, 64+8+9); 
       }
 
       if (sensorModule->two_temp_sensors) {
         u8g2->setFont(u8g2_font_open_iconic_thing_1x_t); 
         // u8g2->setCursor(110, 6);
-        u8g2->drawGlyph(90, 8, 64+8+3); 
-      }
+        u8g2->drawGlyph(90, 9, 64+8+3); 
+      } 
 
-      int logoMargin = 40; 
       u8g2->setFont(u8g2_font_p01type_tn); 
       u8g2->setCursor(110, 7);
       u8g2->print(ntpModule->getTimeString());
 
-      u8g2->setFont(u8g2_font_siji_t_6x10);
-      u8g2->setCursor(logoMargin+10, 16);
-      u8g2->print("3E-MeoBot");
-
-      u8g2->setFont(u8g2_font_siji_t_6x10);
-      u8g2->setCursor(logoMargin+12, 27);
-      u8g2->print("Weather"); 
-
-      u8g2->setCursor(logoMargin+12, 35);
-      u8g2->print("station"); 
-
-      u8g2->setFont(u8g2_font_open_iconic_all_2x_t);
-      u8g2->drawGlyph(74, 60, 152);
-
-
       int marginLeft = 6;
-      u8g2->setFont(u8g2_font_logisoso16_tf);
-      u8g2->setCursor(6+marginLeft, 60);
-      u8g2->print(sensorModule->getTemperatureString(1));
-      u8g2->print("°C");
+      if (sensorModule->_pageIdx == 0) { 
+        int logoMargin = 40; 
+        // u8g2->drawXBM(0,0,128,64, logo); 
+        u8g2->drawXBM(5, 5, 40, 32, cat); 
 
-      u8g2->setCursor(85+marginLeft, 60);
-      u8g2->print(sensorModule->getHumidityString(1));
-      u8g2->print("%"); 
+        u8g2->setFont(u8g2_font_siji_t_6x10);
+        u8g2->setCursor(logoMargin+10, 16);
+        u8g2->print("3E-MeoBot");
+
+        u8g2->setFont(u8g2_font_siji_t_6x10);
+        u8g2->setCursor(logoMargin+12, 27);
+        u8g2->print("Weather"); 
+
+        u8g2->setCursor(logoMargin+12, 35);
+        u8g2->print("station"); 
+
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(6+marginLeft, 60);
+        u8g2->print(sensorModule->getTemperatureString(1));
+        u8g2->print("°C");
+
+        u8g2->setFont(u8g2_font_open_iconic_all_2x_t);
+        u8g2->drawGlyph(74, 60, 152); 
+
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(85+marginLeft, 60);
+
+        u8g2->print(sensorModule->getHumidityString(1));
+        u8g2->print("%"); 
+        
+      }
+      else if (sensorModule->_pageIdx == 1) { 
+        u8g2->setFont(u8g2_font_pxplusibmcga_8u); 
+        u8g2->setCursor(6, 10);
+        u8g2->print("HUMIDITY");
+
+        u8g2->setFont(u8g2_font_open_iconic_all_2x_t);
+        u8g2->drawGlyph(74, 30+2, 152); 
+        u8g2->drawGlyph(74, 60, 152); 
+
+        u8g2->setFont(u8g2_font_unifont_t_symbols);
+        u8g2->setCursor(6, 30-3+2);
+        u8g2->print("Sensor 1");
+
+        u8g2->setFont(u8g2_font_unifont_t_symbols);
+        u8g2->setCursor(6, 60-3+2-2);
+        u8g2->print("Sensor 2");
+
+
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(85+marginLeft, 30+2);
+        u8g2->print(sensorModule->getHumidityString(1));
+        u8g2->print("%"); 
+
+        
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(85+marginLeft, 60);
+        u8g2->print(sensorModule->getHumidityString(2));
+        u8g2->print("%"); 
+      } 
+      else if (sensorModule->_pageIdx == 2) { 
+        u8g2->setFont(u8g2_font_pxplusibmcga_8u); 
+        u8g2->setCursor(2, 10);
+        u8g2->print("TEMPERATURE"); 
+
+        // u8g2->setFont(u8g2_font_open_iconic_all_2x_t);
+        // u8g2->drawGlyph(74, 30+2, 152); 
+        // u8g2->drawGlyph(74, 60, 152); 
+
+        u8g2->setFont(u8g2_font_unifont_t_symbols);
+        u8g2->setCursor(6, 30-3+2);
+        u8g2->print("Sensor 1");
+
+        u8g2->setFont(u8g2_font_unifont_t_symbols);
+        u8g2->setCursor(6, 60-3+2-2);
+        u8g2->print("Sensor 2");
+
+
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(70+marginLeft, 30+2);
+        u8g2->print(sensorModule->getTemperature(1));
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->print("°C");
+
+        
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->setCursor(70+marginLeft, 60);
+        u8g2->print(sensorModule->getTemperature(2));
+        u8g2->setFont(u8g2_font_logisoso16_tf);
+        u8g2->print("°C");
+      }
+        sensorModule->_pin0StateDirty = false; 
     } while (u8g2->nextPage()); 
   }); 
 } 

@@ -26,6 +26,9 @@ class SensorModule: public CMMC_Module {
     float getAnalog(int slot);
     int soil_enable = false; 
     int two_temp_sensors = false; 
+    uint8_t _pageIdx = 0;
+    uint8_t MAX_PAGE = 3;
+    bool _pin0StateDirty = false;
   protected:
     void configWebServer();
   private:
@@ -49,6 +52,7 @@ class SensorModule: public CMMC_Module {
 
     unsigned long counter = 0;
     Adafruit_ADS1115 *ads; 
+
 };
 
 #endif

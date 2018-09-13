@@ -110,8 +110,9 @@ float SensorModule::getAnalog(int slot)
 }
 
 void SensorModule::setup()
-{
+{ 
   Wire.begin(4, 5);
+  pinMode(0, INPUT_PULLUP);
   bme = new Adafruit_BME280();
   bme2 = new Adafruit_BME280();
   bool bme1Status = bme->begin(0x76);
@@ -139,6 +140,13 @@ void SensorModule::setup()
 
 void SensorModule::loop()
 {
+  int pin0State = digitalRead(0);
+  if (!_pin0StateDirty && pin0State == LOW) {
+    this->_pin0StateDirty = true; 
+    _pageIdx  = ++_pageIdx % this->MAX_PAGE;
+    Serial.println(_pageIdx);
+  }
+
   interval.every_ms(2000, [&]() {
     int idx = counter % MAX_ARRAY;
 
@@ -151,16 +159,6 @@ void SensorModule::loop()
     else {
       Serial.printf("[DISABLE] soil sensor is not enabled!\r\n");
     }
-
-
-    // int16_t adc1 = ads->readADC_SingleEnded(1);
-    // int16_t adc2 = ads->readADC_SingleEnded(2);
-    // int16_t adc3 = ads->readADC_SingleEnded(3);
-
-    // Serial.printf("adc0 = %d\r\n", adc0);
-    // Serial.printf("adc1 = %d\r\n", adc1);
-    // Serial.printf("adc2 = %d\r\n", adc2);
-    // Serial.printf("adc3 = %d\r\n", adc3);
 
     temp_array[0][idx] = bme->readTemperature();
     humid_array[0][idx] = bme->readHumidity();
@@ -182,13 +180,12 @@ void SensorModule::loop()
     }
     else
     {
-      
       for(size_t i = 0; i < 2; i++)
       {
-        _temperature[1] = median(temp_array[1], MAX_ARRAY);
-        _humidity[1] = median(humid_array[1], MAX_ARRAY);
-        _pressure[1] = median(pressure_array[1], MAX_ARRAY);
-        _adc0[1] = median(adc0_array[1], MAX_ARRAY);
+        _temperature[i] = median(temp_array[i], MAX_ARRAY);
+        _humidity[i] = median(humid_array[i], MAX_ARRAY);
+        _pressure[i] = median(pressure_array[i], MAX_ARRAY);
+        _adc0[i] = median(adc0_array[i], MAX_ARRAY);
       }
       
     }
