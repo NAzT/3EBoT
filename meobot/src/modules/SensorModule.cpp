@@ -106,7 +106,7 @@ void SensorModule::configWebServer()
 
 float SensorModule::getAnalog(int slot)
 {
-  return _adc0;
+  return _adc0[slot-1];
 }
 
 void SensorModule::setup()
@@ -137,7 +137,7 @@ void SensorModule::loop()
     if (soil_enable) {
       int16_t adc0;
       adc0 = ads->readADC_SingleEnded(0);
-      adc0_array[idx] = adc0; 
+      adc0_array[0][idx] = adc0; 
       Serial.printf("[ENABLE] soil sensor is enabled!\r\n");
     }
     else {
@@ -154,24 +154,24 @@ void SensorModule::loop()
     // Serial.printf("adc2 = %d\r\n", adc2);
     // Serial.printf("adc3 = %d\r\n", adc3);
 
-    temp_array[idx] = bme->readTemperature();
-    humid_array[idx] = bme->readHumidity();
+    temp_array[0][idx] = bme->readTemperature();
+    humid_array[0][idx] = bme->readHumidity();
     if (counter < MAX_ARRAY)
     {
-      _temperature = median(temp_array, idx + 1);
-      _humidity = median(humid_array, idx + 1);
-      _pressure = median(pressure_array, idx + 1);
-      _adc0 = median(adc0_array, idx + 1);
+      _temperature[0] = median(temp_array[0], idx + 1);
+      _humidity[0] = median(humid_array[0], idx + 1);
+      _pressure[0] = median(pressure_array[0], idx + 1);
+      _adc0[0] = median(adc0_array[0], idx + 1);
     }
     else
     {
-      _temperature = median(temp_array, MAX_ARRAY);
-      _humidity = median(humid_array, MAX_ARRAY);
-      _pressure = median(pressure_array, MAX_ARRAY);
-      _adc0 = median(adc0_array, MAX_ARRAY);
+      _temperature[0] = median(temp_array[0], MAX_ARRAY);
+      _humidity[0] = median(humid_array[0], MAX_ARRAY);
+      _pressure[0] = median(pressure_array[0], MAX_ARRAY);
+      _adc0[0] = median(adc0_array[0], MAX_ARRAY);
     }
     
-    float a0_percent = map(_adc0, soil_min, soil_max, 100, 0);
+    float a0_percent = map(_adc0[0], soil_min, soil_max, 100, 0);
     if (soil_enable) {
       soil_moisture_percent = a0_percent; 
       if (a0_percent <= soil_moisture) {
@@ -182,29 +182,29 @@ void SensorModule::loop()
       }
     }
     Serial.printf("temp=%.2f humid=%.2f, adc0=%.2f, %f%%\r\n", 
-      this->_temperature, this->_humidity, this->_adc0, soil_moisture_percent); 
+      this->_temperature[0], this->_humidity[0], this->_adc0[0], soil_moisture_percent); 
     counter++;
   });
 }
 
-String SensorModule::getTemperatureString()
+String SensorModule::getTemperatureString(int slot)
 {
   char buffer[10];
-  sprintf(buffer, "%.1f", _temperature);
+  sprintf(buffer, "%.1f", _temperature[slot-1]);
   return String(buffer);
 }
 
-String SensorModule::getHumidityString()
+String SensorModule::getHumidityString(int slot)
 {
-  return String((int)_humidity);
+  return String((int)_humidity[slot-1]);
 }
 
-float SensorModule::getTemperature()
+float SensorModule::getTemperature(int slot)
 {
-  return _temperature;
+  return _temperature[slot-1];
 }
 
-float SensorModule::getHumidity()
+float SensorModule::getHumidity(int slot)
 {
-  return _humidity;
+  return _humidity[slot-1];
 }

@@ -232,11 +232,11 @@ void LCDModule::loop() {
       int marginLeft = 6;
       u8g2->setFont(u8g2_font_logisoso16_tf);
       u8g2->setCursor(6+marginLeft, 60);
-      u8g2->print(sensorModule->getTemperatureString());
+      u8g2->print(sensorModule->getTemperatureString(1));
       u8g2->print("°C");
 
       u8g2->setCursor(85+marginLeft, 60);
-      u8g2->print(sensorModule->getHumidityString());
+      u8g2->print(sensorModule->getHumidityString(1));
       u8g2->print("%"); 
     } while (u8g2->nextPage()); 
   }); 
