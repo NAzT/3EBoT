@@ -113,10 +113,18 @@ void SensorModule::setup()
 {
   Wire.begin(4, 5);
   bme = new Adafruit_BME280();
-  bool bmeStatus;
-  bmeStatus = bme->begin(0x76);
-  if (!bmeStatus) {
+  bme2 = new Adafruit_BME280();
+  bool bme1Status = bme->begin(0x76);
+  bool bme2Status = bme2->begin(0x77);
+  if (!bme1Status) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  }
+  if (!bme2Status) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  }
+
+  if (bme1Status && bme2Status) {
+    this->two_temp_sensors = 1;
   }
 
   if (soil_enable) {
@@ -156,19 +164,33 @@ void SensorModule::loop()
 
     temp_array[0][idx] = bme->readTemperature();
     humid_array[0][idx] = bme->readHumidity();
+
+    temp_array[1][idx] = bme2->readTemperature();
+    humid_array[1][idx] = bme2->readHumidity();
+
     if (counter < MAX_ARRAY)
-    {
-      _temperature[0] = median(temp_array[0], idx + 1);
-      _humidity[0] = median(humid_array[0], idx + 1);
-      _pressure[0] = median(pressure_array[0], idx + 1);
-      _adc0[0] = median(adc0_array[0], idx + 1);
+    { 
+      
+      for(size_t i = 0; i < 2; i++)
+      {
+        _temperature[i] = median(temp_array[i], idx + 1);
+        _humidity[i] = median(humid_array[i], idx + 1);
+        _pressure[i] = median(pressure_array[i], idx + 1);
+        _adc0[i] = median(adc0_array[i], idx + 1);
+      }
+      
     }
     else
     {
-      _temperature[0] = median(temp_array[0], MAX_ARRAY);
-      _humidity[0] = median(humid_array[0], MAX_ARRAY);
-      _pressure[0] = median(pressure_array[0], MAX_ARRAY);
-      _adc0[0] = median(adc0_array[0], MAX_ARRAY);
+      
+      for(size_t i = 0; i < 2; i++)
+      {
+        _temperature[1] = median(temp_array[1], MAX_ARRAY);
+        _humidity[1] = median(humid_array[1], MAX_ARRAY);
+        _pressure[1] = median(pressure_array[1], MAX_ARRAY);
+        _adc0[1] = median(adc0_array[1], MAX_ARRAY);
+      }
+      
     }
     
     float a0_percent = map(_adc0[0], soil_min, soil_max, 100, 0);
@@ -181,8 +203,12 @@ void SensorModule::loop()
         digitalWrite(2, LOW); 
       }
     }
-    Serial.printf("temp=%.2f humid=%.2f, adc0=%.2f, %f%%\r\n", 
+
+    Serial.printf("temp[0]=%.2f humid[0]=%.2f, adc0[0]=%.2f, %f%%\r\n", 
       this->_temperature[0], this->_humidity[0], this->_adc0[0], soil_moisture_percent); 
+    Serial.printf("temp[1]=%.2f humid[1]=%.2f, adc0[1]=%.2f, %f%%\r\n", 
+      this->_temperature[1], this->_humidity[1], this->_adc0[1], soil_moisture_percent); 
+
     counter++;
   });
 }

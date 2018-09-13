@@ -25,6 +25,7 @@ class SensorModule: public CMMC_Module {
     float getHumidity(int slot);
     float getAnalog(int slot);
     int soil_enable = false; 
+    int two_temp_sensors = false; 
   protected:
     void configWebServer();
   private:

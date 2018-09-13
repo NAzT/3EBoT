@@ -199,14 +199,20 @@ void LCDModule::loop() {
     u8g2->firstPage();
     int factor = micros()%6;
     factor = +0;
+    ntpModule->toggle = !ntpModule->toggle;
     do
     {
       // u8g2->drawXBM(0,0,128,64, logo); 
       u8g2->drawXBM(5, 5, 40, 32, cat); 
       if (sensorModule->soil_enable) {
         u8g2->setFont(u8g2_font_open_iconic_thing_1x_t); 
+        u8g2->drawGlyph(100, 8, 64+8+9); 
+      }
+
+      if (sensorModule->two_temp_sensors) {
+        u8g2->setFont(u8g2_font_open_iconic_thing_1x_t); 
         // u8g2->setCursor(110, 6);
-        u8g2->drawGlyph(100, 8, 64+8+6); 
+        u8g2->drawGlyph(90, 8, 64+8+3); 
       }
 
       int logoMargin = 40; 
