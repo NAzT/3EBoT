@@ -267,7 +267,6 @@ void MqttModule::register_publish_hooks(MqttConnector *mqtt)
     // Serial.printf("sensorModule->adc2 = %d\r\n", sensorModule->adc2);
     // Serial.printf("sensorModule->adc3 = %d\r\n", sensorModule->adc3);
 
-
     Serial.println("PUBLISHING...!");
   }, PUBLISH_EVERY);
 
