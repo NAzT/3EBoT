@@ -106,17 +106,26 @@ void SensorModule::configWebServer()
 
 float SensorModule::getAnalog(int slot)
 {
-  return _adc0;
+  return _adc0[slot-1];
 }
 
 void SensorModule::setup()
-{
+{ 
   Wire.begin(4, 5);
+  pinMode(0, INPUT_PULLUP);
   bme = new Adafruit_BME280();
-  bool bmeStatus;
-  bmeStatus = bme->begin(0x76);
-  if (!bmeStatus) {
+  bme2 = new Adafruit_BME280();
+  bool bme1Status = bme->begin(0x76);
+  bool bme2Status = bme2->begin(0x77);
+  if (!bme1Status) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  }
+  if (!bme2Status) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  }
+
+  if (bme1Status && bme2Status) {
+    this->two_temp_sensors = 1;
   }
 
   if (soil_enable) {
@@ -131,47 +140,57 @@ void SensorModule::setup()
 
 void SensorModule::loop()
 {
+  int pin0State = digitalRead(0);
+  if (!_pin0StateDirty && pin0State == LOW) {
+    this->_pin0StateDirty = true; 
+    _pageIdx  = ++_pageIdx % this->MAX_PAGE;
+    Serial.println(_pageIdx);
+  }
+
   interval.every_ms(2000, [&]() {
     int idx = counter % MAX_ARRAY;
 
     if (soil_enable) {
       int16_t adc0;
       adc0 = ads->readADC_SingleEnded(0);
-      adc0_array[idx] = adc0; 
+      adc0_array[0][idx] = adc0; 
       Serial.printf("[ENABLE] soil sensor is enabled!\r\n");
     }
     else {
       Serial.printf("[DISABLE] soil sensor is not enabled!\r\n");
     }
 
+    temp_array[0][idx] = bme->readTemperature();
+    humid_array[0][idx] = bme->readHumidity();
 
-    // int16_t adc1 = ads->readADC_SingleEnded(1);
-    // int16_t adc2 = ads->readADC_SingleEnded(2);
-    // int16_t adc3 = ads->readADC_SingleEnded(3);
+    temp_array[1][idx] = bme2->readTemperature();
+    humid_array[1][idx] = bme2->readHumidity();
 
-    // Serial.printf("adc0 = %d\r\n", adc0);
-    // Serial.printf("adc1 = %d\r\n", adc1);
-    // Serial.printf("adc2 = %d\r\n", adc2);
-    // Serial.printf("adc3 = %d\r\n", adc3);
-
-    temp_array[idx] = bme->readTemperature();
-    humid_array[idx] = bme->readHumidity();
     if (counter < MAX_ARRAY)
-    {
-      _temperature = median(temp_array, idx + 1);
-      _humidity = median(humid_array, idx + 1);
-      _pressure = median(pressure_array, idx + 1);
-      _adc0 = median(adc0_array, idx + 1);
+    { 
+      
+      for(size_t i = 0; i < 2; i++)
+      {
+        _temperature[i] = median(temp_array[i], idx + 1);
+        _humidity[i] = median(humid_array[i], idx + 1);
+        _pressure[i] = median(pressure_array[i], idx + 1);
+        _adc0[i] = median(adc0_array[i], idx + 1);
+      }
+      
     }
     else
     {
-      _temperature = median(temp_array, MAX_ARRAY);
-      _humidity = median(humid_array, MAX_ARRAY);
-      _pressure = median(pressure_array, MAX_ARRAY);
-      _adc0 = median(adc0_array, MAX_ARRAY);
+      for(size_t i = 0; i < 2; i++)
+      {
+        _temperature[i] = median(temp_array[i], MAX_ARRAY);
+        _humidity[i] = median(humid_array[i], MAX_ARRAY);
+        _pressure[i] = median(pressure_array[i], MAX_ARRAY);
+        _adc0[i] = median(adc0_array[i], MAX_ARRAY);
+      }
+      
     }
     
-    float a0_percent = map(_adc0, soil_min, soil_max, 100, 0);
+    float a0_percent = map(_adc0[0], soil_min, soil_max, 100, 0);
     if (soil_enable) {
       soil_moisture_percent = a0_percent; 
       if (a0_percent <= soil_moisture) {
@@ -181,30 +200,34 @@ void SensorModule::loop()
         digitalWrite(2, LOW); 
       }
     }
-    Serial.printf("temp=%.2f humid=%.2f, adc0=%.2f, %f%%\r\n", 
-      this->_temperature, this->_humidity, this->_adc0, soil_moisture_percent); 
+
+    Serial.printf("temp[0]=%.2f humid[0]=%.2f, adc0[0]=%.2f, %f%%\r\n", 
+      this->_temperature[0], this->_humidity[0], this->_adc0[0], soil_moisture_percent); 
+    Serial.printf("temp[1]=%.2f humid[1]=%.2f, adc0[1]=%.2f, %f%%\r\n", 
+      this->_temperature[1], this->_humidity[1], this->_adc0[1], soil_moisture_percent); 
+
     counter++;
   });
 }
 
-String SensorModule::getTemperatureString()
+String SensorModule::getTemperatureString(int slot)
 {
   char buffer[10];
-  sprintf(buffer, "%.1f", _temperature);
+  sprintf(buffer, "%.1f", _temperature[slot-1]);
   return String(buffer);
 }
 
-String SensorModule::getHumidityString()
+String SensorModule::getHumidityString(int slot)
 {
-  return String((int)_humidity);
+  return String((int)_humidity[slot-1]);
 }
 
-float SensorModule::getTemperature()
+float SensorModule::getTemperature(int slot)
 {
-  return _temperature;
+  return _temperature[slot-1];
 }
 
-float SensorModule::getHumidity()
+float SensorModule::getHumidity(int slot)
 {
-  return _humidity;
+  return _humidity[slot-1];
 }

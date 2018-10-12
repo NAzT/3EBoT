@@ -8,7 +8,7 @@
 #include "modules/MqttModule.h"
 #include "modules/SensorModule.h"
 
-const char* MEOBOT_VERSION = "1.4";
+const char* MEOBOT_VERSION = "1.5";
 
 CMMC_Legend os; 
 LCDModule *lcdModule;

@@ -15,6 +15,7 @@ class NTPModule: public CMMC_Module {
     void configLoop();
     void printTime();
     String getTimeString();
+    bool toggle = 0;
   protected:
     void configWebServer();
     void sendNTPpacket(IPAddress& address);

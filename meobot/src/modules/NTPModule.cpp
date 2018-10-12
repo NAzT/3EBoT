@@ -93,7 +93,12 @@ String NTPModule::getTimeString() {
   String timeString = "";
   unsigned long _epoch = epoch+25200;
   timeString += ((_epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
-  timeString += (':');
+  if (toggle == true) {
+    timeString += (':'); 
+  }
+  else {
+    timeString += ('.'); 
+  } 
   if ( ((_epoch % 3600) / 60) < 10 ) {
     timeString+=('0');
   }
