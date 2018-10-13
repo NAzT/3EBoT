@@ -1,18 +1,17 @@
 #include <CMMC_Module.h>
 
-#ifndef CMMC_SensorModule_MODULE_H
-#define CMMC_SensorModule_MODULE_H 
+#ifndef CMMC_ADCSensors_MODULE_H
+#define CMMC_ADCSensors_MODULE_H 
 
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <CMMC_Sensor.h>
-#include <CMMC_Interval.h>
-#include <Adafruit_BME280.h>
+#include <CMMC_Interval.h> 
 #include <Adafruit_ADS1015.h> 
 #include "../utils/utils.h"
 
+
 const int MAX_ARRAY = 3;
-class SensorModule: public CMMC_Module {
+class ADCSensors: public CMMC_Module {
   public:
     float soil_moisture_percent = 0.0;
     void config(CMMC_System *os, AsyncWebServer* server); 
@@ -20,21 +19,14 @@ class SensorModule: public CMMC_Module {
     void loop(); 
     void isLongPressed(); 
     void configLoop();
-    String getTemperatureString(int slot);
-    String getHumidityString(int slot);
-    float getTemperature(int slot);
-    float getHumidity(int slot);
     float getAnalog(int slot);
-    int soil_enable = false; 
-    int two_temp_sensors = false; 
+    int soil_enable = true; 
     uint8_t _pageIdx = 0;
     uint8_t MAX_PAGE = 3;
     bool _pin0StateDirty = false;
   protected:
     void configWebServer();
   private:
-    Adafruit_BME280 *bme;
-    Adafruit_BME280 *bme2;
     CMMC_SENSOR_DATA_T data1; 
     CMMC_Interval interval;
     
@@ -53,7 +45,6 @@ class SensorModule: public CMMC_Module {
 
     unsigned long counter = 0;
     Adafruit_ADS1115 *ads; 
-
 };
 
 #endif

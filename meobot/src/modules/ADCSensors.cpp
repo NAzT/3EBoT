@@ -1,12 +1,13 @@
-#include "SensorModule.h"
+#include "ADCSensors.h"
 #include "LCDModule.h"
-extern LCDModule *lcdModule; 
 
-void SensorModule::configLoop()
+extern LCDModule *lcdModule;
+
+void ADCSensors::configLoop()
 {
 }
 
-void SensorModule::config(CMMC_System *os, AsyncWebServer *server)
+void ADCSensors::config(CMMC_System *os, AsyncWebServer *server)
 {
   strcpy(this->path, "/api/sensors");
   this->_serverPtr = server;
@@ -38,7 +39,7 @@ void SensorModule::config(CMMC_System *os, AsyncWebServer *server)
   // }
 }
 
-void SensorModule::configWebServer()
+void ADCSensors::configWebServer()
 {
   _serverPtr->on(this->path, HTTP_POST, [&](AsyncWebServerRequest *request) {
     String output = saveConfig(request, this->_managerPtr);
@@ -47,33 +48,15 @@ void SensorModule::configWebServer()
 }
 
 
-float SensorModule::getAnalog(int slot)
+float ADCSensors::getAnalog(int slot)
 {
   return _adc0[slot-1];
 }
 
-void SensorModule::setup()
+void ADCSensors::setup()
 { 
   Wire.begin(4, 5);
   pinMode(0, INPUT_PULLUP);
-  bme = new Adafruit_BME280();
-  bme2 = new Adafruit_BME280();
-  bool bme1Status = bme->begin(0x76);
-  bool bme2Status = bme2->begin(0x77);
-  if (!bme1Status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-  }
-  if (!bme2Status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-  }
-
-  if (bme1Status && bme2Status) {
-    this->two_temp_sensors = 1;
-  }
-
-  if (soil_enable) {
-    pinMode(2, OUTPUT);
-  }
 
   ads = new Adafruit_ADS1115(0x48); 
   ads->setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV 
@@ -81,7 +64,7 @@ void SensorModule::setup()
   ads->begin(); 
 }
 
-void SensorModule::loop()
+void ADCSensors::loop()
 {
   int pin0State = digitalRead(0);
   if (!_pin0StateDirty && pin0State == LOW) {
@@ -102,12 +85,6 @@ void SensorModule::loop()
     else {
       Serial.printf("[DISABLE] soil sensor is not enabled!\r\n");
     }
-
-    temp_array[0][idx] = bme->readTemperature();
-    humid_array[0][idx] = bme->readHumidity();
-
-    temp_array[1][idx] = bme2->readTemperature();
-    humid_array[1][idx] = bme2->readHumidity();
 
     if (counter < MAX_ARRAY)
     { 
@@ -151,26 +128,4 @@ void SensorModule::loop()
 
     counter++;
   });
-}
-
-String SensorModule::getTemperatureString(int slot)
-{
-  char buffer[10];
-  sprintf(buffer, "%.1f", _temperature[slot-1]);
-  return String(buffer);
-}
-
-String SensorModule::getHumidityString(int slot)
-{
-  return String((int)_humidity[slot-1]);
-}
-
-float SensorModule::getTemperature(int slot)
-{
-  return _temperature[slot-1];
-}
-
-float SensorModule::getHumidity(int slot)
-{
-  return _humidity[slot-1];
 }
